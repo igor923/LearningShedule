@@ -8,21 +8,21 @@
 <body>
 <form class="form-inline" onsubmit="return false;">
 	<div class="form-group">
-		<label for="idInput">TeudatZeut</label>
-	<input id="idInput" class="form-control" type="text" placeholder="id">
+		<label for="idInput">Passport ID:</label>
+	<input id="idInput" class="form-control" type="number" placeholder="id">
 	</div>
 	<div class="form-group">
-		<label for="nameInput">Name</label>
+		<label for="nameInput">Name:</label>
 	<input id="nameInput" class="form-control" type="text" placeholder="name">
 	</div>
 	<div class="form-group">
-		<label for="lastnameInput">lName</label>
+		<label for="lastnameInput">Last name:</label>
 	<input id="lastnameInput" class="form-control" type="text" placeholder="lastname">
 	</div>
-	<button id="add" class="btn btn btn-default">add</button>
+	<button id="add" class="btn btn btn-success">add</button>
 	<button id="clear" class="btn btn-default">clear</button>
-	<button id="deleteFromDB" class="btn btn-default">deleteFromDB!!!</button>
-	<button id="getAll" class="btn btn-default">getAll</button>
+	<button id="deleteFromDB" class="btn btn-danger">deleteFromDB!!!</button>
+	<button id="getAll" class="btn btn-primary">getAll</button>
 </form>
 <div class="panel panel-default">
 	<div class="panel-heading">
@@ -51,18 +51,21 @@
 	getAllBtn.onclick = function () {
 	   var url = '/get/users';
 		testLogger.innerText = requestToServer(url);
+		formClear();
 	};
 
 	addBtn.onclick = function(){
 		var fields = userValues();
         var url = '/add/user?passportID='+fields.id+'&firstName='+fields.name+'&lastName='+fields.lastName;
 		testLogger.innerText = requestToServer(url);
+		formClear();
 	};
 
 	delFromDBBtn.onclick = function () {
 		var id = userValues().id;
 		var url = '/del/user?passportID='+id;
 		testLogger.innerText = requestToServer(url);
+		formClear();
 	};
 
 
@@ -87,6 +90,13 @@
 			alert(newRequest.status + "Error :" + newRequest.statusText);
 		}else{
 			return newRequest.responseText;
+		}
+	}
+
+	function formClear() {
+		var inputs = document.getElementsByClassName("form-control");
+		for (var i = 0; i < inputs.length; i++) {
+			inputs[i].value = "";
 		}
 	}
 
