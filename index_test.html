@@ -1,39 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>LearningScheduleEarly</title>
+	<link href="style.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
-<style>
-	
-</style>
 <body>
-<div class="container">
-	<input id="idInput" type="text" placeholder="id">
-	<input id="nameInput" type="text" placeholder="name">
-	<input id="lastnameInput" type="text" placeholder="lastname">
-	<button id="add">add</button>
-	<button id="clear">clear</button>
-	<button id="deleteFromDB">deleteFromDB!!!</button>
+<form class="form-inline" onsubmit="return false;">
+	<div class="form-group">
+		<label for="idInput">TeudatZeut</label>
+	<input id="idInput" class="form-control" type="text" placeholder="id">
+	</div>
+	<div class="form-group">
+		<label for="nameInput">Name</label>
+	<input id="nameInput" class="form-control" type="text" placeholder="name">
+	</div>
+	<div class="form-group">
+		<label for="lastnameInput">lName</label>
+	<input id="lastnameInput" class="form-control" type="text" placeholder="lastname">
+	</div>
+	<button id="add" class="btn btn btn-default">add</button>
+	<button id="clear" class="btn btn-default">clear</button>
+	<button id="deleteFromDB" class="btn btn-default">deleteFromDB!!!</button>
+	<button id="getAll" class="btn btn-default">getAll</button>
+</form>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">ServerResponse</h3>
+	</div>
+	<div class="panel-body">
+		<span id="testLogger"></span>
+	</div>
+
+	<div class="panel-heading">
+		<h3 class="panel-title">StudentList</h3>
+	</div>
+	<div class="panel-body">
+		<span id="studentList"></span>
+	</div>
 </div>
+
 <script type="text/javascript">
 	var addBtn = document.getElementById('add');
 	var clearBtn = document.getElementById('clear');
 	var delFromDBBtn = document.getElementById('deleteFromDB');
+	var testLogger = document.getElementById('testLogger');
+	var getAllBtn = document.getElementById('getAll');
 
 
+	getAllBtn.onclick = function () {
+	   var url = '/get/users';
+		testLogger.innerText = requestToServer(url);
+	};
 
 	addBtn.onclick = function(){
 		var fields = userValues();
         var url = '/add/user?passportID='+fields.id+'&firstName='+fields.name+'&lastName='+fields.lastName;
-       console.log(requestToServer(url));
+		testLogger.innerText = requestToServer(url);
 	};
 
 	delFromDBBtn.onclick = function () {
 		var id = userValues().id;
 		var url = '/del/user?passportID='+id;
-		console.log(requestToServer(url));
-
+		testLogger.innerText = requestToServer(url);
 	};
+
+
 
 	var userValues = function () {
 		var id = document.getElementById('idInput').value;
