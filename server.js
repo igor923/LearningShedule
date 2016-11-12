@@ -127,6 +127,29 @@ app.get('/*', function (getReq, getRes) {
             });
             break;
         }
+        case '/del/user':
+        {
+            getReq.on('data', function () {});
+            getReq.on('end', function () {
+                passportID = getReq.query.passportID;
+                var sqlScript = 'delete from students where passportID = ?';
+                connection.query(sqlScript, passportID, function (err, sqlRes) {
+                    var result = {};
+                    if (err) {
+                        console.log(err);
+                        result.status = 'error';
+                        result.reason = 'insert failed';
+                        result.fullErrorText = err;
+                    } else {
+                        console.log(sqlRes);
+                        result.status = 'ok';
+                        result.reason = 'record deleted';
+                    }
+                    getRes.end(JSON.stringify(result));
+                });
+            });
+            break;
+        }
         case '/':
         {
             getRes.sendfile("index.html");
