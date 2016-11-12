@@ -28,8 +28,8 @@
 
 	var requestToServer = function(id,name,lastname){
        var newRequest = new XMLHttpRequest();
-		newRequest.open('GET', '/add/user', false);
-		newRequest.send('fuck u');  // send something!!!
+		newRequest.open('GET', '/add/user?passportID='+id+'&firstName='+name+'&lastName='+lastname, false);
+		newRequest.send();  // send something!!!
 		if(newRequest.status !== 200){
 			alert(newRequest.status + "Error :" + newRequest.statusText);
 		}else{

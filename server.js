@@ -6,46 +6,18 @@ var mysql = require('mysql');
 var app = express();
 var port = 3000;
 
-var dataBaseScript = "" +
-    "CREATE TABLE IF NOT EXISTS " +
-    "`events`.`users` " +
-    "(" +
-    "`userId` INT UNSIGNED AUTO_INCREMENT ," +
-    "`name` VARCHAR(32)  DEFAULT NULL ," +
-    "`password` VARCHAR(32)  DEFAULT NULL ," +
-    "`shown_name` VARCHAR(32)  DEFAULT NULL ," +
-    "`token` VARCHAR(64)  DEFAULT NULL ," +
-    "PRIMARY KEY (`userId`), " +
-    "UNIQUE `name` (`name`)" +
-    ");";
-
 var tableStudentScript = "" +
-    "CREATE TABLE TABLE IF NOT EXISTS `students` (    " +
-    "`idStudent` int(11) NOT NULL,    " +
+    "CREATE TABLE IF NOT EXISTS `students` (    " +
+    "`idStudent` int(11) UNSIGNED AUTO_INCREMENT ,    " +
     "`firstName` varchar(35) DEFAULT NULL,    " +
     "`lastName` varchar(50) DEFAULT NULL,    " +
     "`phone` varchar(20) DEFAULT NULL,    " +
     "`e-mail` varchar(255) DEFAULT NULL,    " +
     "`address` varchar(255) DEFAULT NULL,    " +
-    "`passportID` int(11) DEFAULT NULL" +
+    "`passportID` int(11) DEFAULT NULL," +
+    "PRIMARY KEY (`idStudent`)," +
+    "UNIQUE `passportID`(`passportID`)" +
     ")";
-{
-    var insertScript = "INSERT INTO `users` " +
-        "(" +
-        "`userId`, " +
-        "`name`, " +
-        "`password`, " +
-        "`shown_name`, " +
-        "`token`" +
-        ") " +
-        "VALUES (" +
-        "NULL, " +
-        "'_NAME_', " +
-        "'_PASS_', " +
-        "NULL, " +
-        "NULL" +
-        ");";
-}
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -53,7 +25,7 @@ var connection = mysql.createConnection({
     database: 'events'
 });
 
-connection.query(dataBaseScript, function (err, res, fields) {
+connection.query(tableStudentScript, function (err, res, fields) {
     console.log(err);
 });
 
@@ -95,37 +67,6 @@ app.get('/*', function (getReq, getRes) {
             });
             break;
         }
-        case '/addUser':
-        {
-            getReq.on('data', function () {});
-            getReq.on('end', function () {
-                console.log(req.query);
-                firstName = getReq.query.firstName;
-                lastName = getReq.query.lastName;
-                passportID = getReq.query.passportID;
-                var sqlScript = 'insert into students set ?';
-                var studentSet = {
-                    firstName: firstName,
-                    lastName: lastName,
-                    passportID: passportID
-                };
-                connection.query(sqlScript, studentSet, function (err, sqlRes) {
-                    var result = {};
-                    if (err) {
-                        console.log(err);
-                        result.status = 'error';
-                        result.reason = 'insert failed';
-                        result.fullErrorText = err;
-                    } else {
-                        console.log(sqlRes);
-                        result.status = 'ok';
-                        result.reason = 'new record inserted';
-                    }
-                    getRes.end(JSON.stringify(result));
-                });
-            });
-            break;
-        }
         case '/sendNamePassword':
         {
             getReq.on('data', function () {
@@ -155,6 +96,37 @@ app.get('/*', function (getReq, getRes) {
             });
             break;
         }
+        case '/add/user':
+        {
+            getReq.on('data', function () {});
+            getReq.on('end', function () {
+                firstName = getReq.query.firstName;
+                lastName = getReq.query.lastName;
+                passportID = getReq.query.passportID;
+                var sqlScript = 'insert into students set ?';
+                var studentSet = {
+                    idStudent:null,
+                    firstName: firstName,
+                    lastName: lastName,
+                    passportID: passportID
+                };
+                connection.query(sqlScript, studentSet, function (err, sqlRes) {
+                    var result = {};
+                    if (err) {
+                        console.log(err);
+                        result.status = 'error';
+                        result.reason = 'insert failed';
+                        result.fullErrorText = err;
+                    } else {
+                        console.log(sqlRes);
+                        result.status = 'ok';
+                        result.reason = 'new record inserted';
+                    }
+                    getRes.end(JSON.stringify(result));
+                });
+            });
+            break;
+        }
         case '/':
         {
             getRes.sendfile("index.html");
@@ -162,7 +134,7 @@ app.get('/*', function (getReq, getRes) {
         }
         default:
         {
-            getRes.sendfile(getReq.path);
+            getRes.sendfile(getReq.path.replace('/',''));
         }
     }
 });
