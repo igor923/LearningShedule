@@ -40,62 +40,6 @@ app.listen(port, function () {
 
 app.get('/*', function (getReq, getRes) {
     switch (getReq.path) {
-        case '/registerNamePassword':
-        {
-            getReq.on('data', function () {
-            });
-            getReq.on('end', function () {
-                // console.log(req.query);
-                name = getReq.query.name;
-                pass = getReq.query.pass;
-
-                var sqlScript = 'insert into users set ?';
-                connection.query(sqlScript, {name: name, password: pass}, function (err, sqlRes) {
-                    var result = {};
-                    if (err) {
-                        console.log(err);
-                        result.status = 'error';
-                        result.reason = 'insert name-password pair failed';
-                    } else {
-                        console.log(sqlRes);
-                        result.status = 'ok';
-                        result.reason = 'new record inserted';
-
-                    }
-                    getRes.end(JSON.stringify(result));
-                });
-            });
-            break;
-        }
-        case '/sendNamePassword':
-        {
-            getReq.on('data', function () {
-                // console.log(e);
-            });
-
-            getReq.on('end', function () {
-                // console.log(req.query);
-                name = getReq.query.name;
-                pass = getReq.query.pass;
-
-                var sqlScript = 'select password from users where ?';
-                connection.query(sqlScript, {name: name}, function (err, sqlRes) {
-                    var result = {};
-                    if (sqlRes.length == 0) {
-                        result.status = 'error';
-                        result.reason = 'userNotFound';
-                    } else if (pass == sqlRes[0].password) {
-                        result.status = 'ok';
-                        result.reason = 'passwordConfirmed';
-                    } else {
-                        result.status = 'error';
-                        result.reason = 'userAndPasswordNotMatches';
-                    }
-                    getRes.end(JSON.stringify(result));
-                });
-            });
-            break;
-        }
         case '/add/user':
         {
             getReq.on('data', function () {});
@@ -121,6 +65,29 @@ app.get('/*', function (getReq, getRes) {
                         console.log(sqlRes);
                         result.status = 'ok';
                         result.reason = 'new record inserted';
+                    }
+                    getRes.end(JSON.stringify(result));
+                });
+            });
+            break;
+        }
+        case '/get/users':
+        {
+            getReq.on('data', function () {});
+            getReq.on('end', function () {
+                var sqlScript = 'select * from students ';
+                connection.query(sqlScript, {}, function (err, sqlRes) {
+                    var result = {};
+                    if (err) {
+                        console.log(err);
+                        result.status = 'error';
+                        result.reason = 'select failed';
+                        result.fullErrorText = err;
+                    } else {
+                        console.log(sqlRes);
+                        result.status = 'ok';
+                        result.reason = 'select done';
+                        result.students = sqlRes;
                     }
                     getRes.end(JSON.stringify(result));
                 });
