@@ -35,8 +35,15 @@
 	<div class="panel-heading">
 		<h3 class="panel-title">StudentList</h3>
 	</div>
-	<div class="panel-body">
-		<span id="studentList"></span>
+	<div class="table-bordered">
+		<table id="studentsList" class="table table-bordered">
+			<tr>
+			<td>#</td>
+			<td>Name</td>
+			<td>Last Name</td>
+			<td>Teudat Zeut</td>
+			</tr>
+		</table>
 	</div>
 </div>
 
@@ -46,11 +53,26 @@
 	var delFromDBBtn = document.getElementById('deleteFromDB');
 	var testLogger = document.getElementById('testLogger');
 	var getAllBtn = document.getElementById('getAll');
-
+	var studentsTbl = document.getElementById('studentsList');
 
 	getAllBtn.onclick = function () {
 	   var url = '/get/users';
-		testLogger.innerText = requestToServer(url);
+		var responseJSON = requestToServer(url);
+		testLogger.innerText = responseJSON;
+		var response = JSON.parse(responseJSON);
+		var students =response.students;
+
+		while(studentsTbl.rows.length>1){
+			studentsTbl.deleteRow(1);
+		}
+		for(let i=0; i<students.length;i++){
+		var newRow = document.createElement('tr');
+			newRow.insertCell().innerText = students[i].idStudent;
+			newRow.insertCell().innerText = students[i].firstName;
+			newRow.insertCell().innerText = students[i].lastName;
+			newRow.insertCell().innerText = students[i].passportID;
+			studentsTbl.appendChild(newRow);
+		}
 	};
 
 	addBtn.onclick = function(){
