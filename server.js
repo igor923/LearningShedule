@@ -140,11 +140,14 @@ app.get('/*', function (getReq, getRes) {
                         result.status = 'error';
                         result.reason = 'insert failed';
                         result.fullErrorText = err;
-                    } else {
-                        console.log(sqlRes);
+                    } else if (sqlRes.affectedRows!=0){
                         result.status = 'ok';
                         result.reason = 'record deleted';
+                    } else if (sqlRes.affectedRows==0){
+                        result.status = 'warning';
+                        result.reason = 'record not found';
                     }
+
                     getRes.end(JSON.stringify(result));
                 });
             });
