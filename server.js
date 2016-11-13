@@ -5,6 +5,7 @@ const url = require('url');
 var mysql = require('mysql');
 var app = express();
 var port = 3000;
+var headers=require('./headers');
 var dataBaseName = 'learning sheduler';
 
 {
@@ -41,7 +42,7 @@ app.listen(port, function () {
 });
 
 app.get('/*', function (getReq, getRes) {
-    getRes.setHeader("Access-Control-Allow-Origin","*");
+    headers.setHeaders(getRes);
     getReq.on('data', function (chunk) {console.log(chunk)});
     switch (getReq.path) {
         case '/add/user':
