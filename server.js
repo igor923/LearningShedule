@@ -139,10 +139,18 @@ app.get('/*', function (getReq, getRes) {
                 var sqlScript = 'select pass from auth where name=?';
                 var result;
                 connection.query(sqlScript, name ,function (err,sqlRes) {
-                    if(err) result =  'not ok';
-                     result =  'ok';
-
-                    console.log(sqlRes);
+                    if(sqlRes.length !==0) {
+                        if (pass === sqlRes[0].pass) result = 'ok';
+                        else if (pass !== sqlRes[0].pass) result = 'password is incorrect';
+                    }
+                    else if(sqlRes.length ===0) result = 'does not exist such user name';
+                    else if (err) {
+                        console.log(err);
+                        result.status = 'error';
+                        result.reason = 'insert failed';
+                        result.fullErrorText = err;
+                    }
+                    console.log(sqlRes); //>>>[0].pass
                     getRes.end(result);
 
                 } )
