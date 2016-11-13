@@ -13,7 +13,7 @@ var dataBaseName = 'events';
         "CREATE TABLE IF NOT EXISTS `" +
         'students' +
         "` (    " +
-        "`idStudent` int(11) UNSIGNED AUTO_INCREMENT ,    " +
+        "`idStudent` int UNSIGNED AUTO_INCREMENT,    " +
         "`firstName` varchar(35) DEFAULT NULL,    " +
         "`lastName` varchar(50) DEFAULT NULL,    " +
         "`phone` varchar(20) DEFAULT NULL,    " +
@@ -47,13 +47,14 @@ app.get('/*', function (getReq, getRes) {
     switch (getReq.path) {
         case '/add/user':
         {
+            console.log(getReq.query);
             getReq.on('end', function () {
                 var firstName = getReq.query.firstName;
                 var lastName = getReq.query.lastName;
                 var passportID = getReq.query.passportID;
                 var sqlScript = 'insert into students set ?';
                 var studentSet = {
-                    idStudent: 0,
+                    idStudent: null,
                     firstName: firstName,
                     lastName: lastName,
                     passportID: passportID
