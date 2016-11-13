@@ -6,7 +6,7 @@ var mysql = require('mysql');
 var app = express();
 var port = 3000;
 var headers=require('./headers');
-var dataBaseName = 'learning sheduler';
+var dataBaseName = 'events';
 
 {
     var tableStudentScript = "" +
@@ -125,6 +125,7 @@ app.get('/*', function (getReq, getRes) {
         }
         case '/':
         {
+            console.log("Hello" + getReq.path);
             getRes.sendfile("index.html");
             break
         }

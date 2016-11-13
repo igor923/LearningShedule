@@ -57,7 +57,6 @@
 
 	getAllBtn.onclick = function () {
 	   var url = '/get/users';
-<<<<<<< HEAD:index_test.html
 		var responseJSON = requestToServer(url);
 		testLogger.innerText = responseJSON;
 		var response = JSON.parse(responseJSON);
@@ -74,10 +73,9 @@
 			newRow.insertCell().innerText = students[i].passportID;
 			studentsTbl.appendChild(newRow);
 		}
-=======
+
 		testLogger.innerText = requestToServer(url);
 		formClear();
->>>>>>> 2f8bad423fcedb013937fc236f790db5dcb70e09:index.html
 	};
 
 	addBtn.onclick = function(){
@@ -117,7 +115,7 @@
 		}else{
 			return newRequest.responseText;
 		}
-	}
+	};
 
 	function formClear() {
 		var inputs = document.getElementsByClassName("form-control");
