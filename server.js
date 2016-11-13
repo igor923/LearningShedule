@@ -41,6 +41,7 @@ app.listen(port, function () {
 });
 
 app.get('/*', function (getReq, getRes) {
+    getRes.setHeader("Access-Control-Allow-Origin","*");
     getReq.on('data', function (chunk) {console.log(chunk)});
     switch (getReq.path) {
         case '/add/user':
