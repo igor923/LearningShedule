@@ -18,11 +18,12 @@ var tableStudentScript = "" +
     "PRIMARY KEY (`idStudent`)," +
     "UNIQUE `passportID`(`passportID`)" +
     ")";
+
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'events'
+    database: 'learning sheduler'
 });
 
 connection.query(tableStudentScript, function (err, res, fields) {
@@ -107,10 +108,10 @@ app.get('/*', function (getReq, getRes) {
                         result.status = 'error';
                         result.reason = 'insert failed';
                         result.fullErrorText = err;
-                    } else if (sqlRes.affectedRows!=0){
+                    } else if (sqlRes.affectedRows != 0){
                         result.status = 'ok';
                         result.reason = 'record deleted';
-                    } else if (sqlRes.affectedRows==0){
+                    } else if (sqlRes.affectedRows == 0){
                         result.status = 'warning';
                         result.reason = 'record not found';
                     }
@@ -131,5 +132,3 @@ app.get('/*', function (getReq, getRes) {
         }
     }
 });
-
-

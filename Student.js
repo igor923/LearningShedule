@@ -1,5 +1,5 @@
 'use strict';
-class Student{
+class Student {
 
      constructor(name,lastname,phone,email,adress,passportID,status){
            this.name = name;
@@ -11,12 +11,12 @@ class Student{
      }
 
      toString(){
-         return console.log("name: " + this.name + ";\n" +
+         return "name: " + this.name + ";\n" +
                  "lastname: " + this.lastname + ";\n" +
                  "phone: " + this.phone + ";\n" +
                  "email: " + this.email + ";\n" +
                  "adress: " + this.adress + ";\n" +
-                 "passportID"  + this.passportID + ";\n");
+                 "passportID"  + this.passportID + ";\n";
      }
 
      getAll(){
@@ -32,4 +32,3 @@ var s1 = new Student("Gennadii", "Tsypenko", "0544564564", "asda@gmail.com", "Ba
 s1.toString();
 s1.getAll();
 console.log(s1.name);
-
