@@ -27,7 +27,7 @@ var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
-    port:3306,
+    port: 3306,
     database: dataBaseName
 });
 
@@ -41,17 +41,17 @@ app.listen(port, function () {
 });
 
 app.get('/*', function (getReq, getRes) {
+    getReq.on('data', function (chunk) {console.log(chunk)});
     switch (getReq.path) {
         case '/add/user':
         {
-            getReq.on('data', function () {});
             getReq.on('end', function () {
-                firstName = getReq.query.firstName;
-                lastName = getReq.query.lastName;
-                passportID = getReq.query.passportID;
+                var firstName = getReq.query.firstName;
+                var lastName = getReq.query.lastName;
+                var passportID = getReq.query.passportID;
                 var sqlScript = 'insert into students set ?';
                 var studentSet = {
-                    idStudent:null,
+                    idStudent: null,
                     firstName: firstName,
                     lastName: lastName,
                     passportID: passportID
@@ -75,7 +75,7 @@ app.get('/*', function (getReq, getRes) {
         }
         case '/get/users':
         {
-            getReq.on('data', function () {});
+
             getReq.on('end', function () {
                 var sqlScript = 'select * from students ';
                 connection.query(sqlScript, {}, function (err, sqlRes) {
@@ -98,7 +98,6 @@ app.get('/*', function (getReq, getRes) {
         }
         case '/del/user':
         {
-            getReq.on('data', function () {});
             getReq.on('end', function () {
                 passportID = getReq.query.passportID;
                 var sqlScript = 'delete from students where passportID = ?';
@@ -109,10 +108,10 @@ app.get('/*', function (getReq, getRes) {
                         result.status = 'error';
                         result.reason = 'insert failed';
                         result.fullErrorText = err;
-                    } else if (sqlRes.affectedRows != 0){
+                    } else if (sqlRes.affectedRows != 0) {
                         result.status = 'ok';
                         result.reason = 'record deleted';
-                    } else if (sqlRes.affectedRows == 0){
+                    } else if (sqlRes.affectedRows == 0) {
                         result.status = 'warning';
                         result.reason = 'record not found';
                     }
@@ -129,7 +128,7 @@ app.get('/*', function (getReq, getRes) {
         }
         default:
         {
-            getRes.sendfile(getReq.path.replace('/',''));
+            getRes.sendfile(getReq.path.replace('/', ''));
         }
     }
 });
