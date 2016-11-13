@@ -53,7 +53,7 @@ app.get('/*', function (getReq, getRes) {
                 var passportID = getReq.query.passportID;
                 var sqlScript = 'insert into students set ?';
                 var studentSet = {
-                    idStudent: null,
+                    idStudent: 0,
                     firstName: firstName,
                     lastName: lastName,
                     passportID: passportID
@@ -134,4 +134,8 @@ app.get('/*', function (getReq, getRes) {
             getRes.sendfile(getReq.path.replace('/', ''));
         }
     }
+});
+
+app.post('/*',function (postReq,postRes) {
+
 });
