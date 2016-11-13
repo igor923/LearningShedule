@@ -73,23 +73,22 @@
 			newRow.insertCell().innerText = students[i].passportID;
 			studentsTbl.appendChild(newRow);
 		}
-
 		testLogger.innerText = requestToServer(url);
-		formClear();
+		/*formClear();*/
 	};
 
 	addBtn.onclick = function(){
 		var fields = userValues();
         var url = '/add/user?passportID='+fields.id+'&firstName='+fields.name+'&lastName='+fields.lastName;
 		testLogger.innerText = requestToServer(url);
-		formClear();
+		/*formClear();*/
 	};
 
 	delFromDBBtn.onclick = function () {
 		var id = userValues().id;
 		var url = '/del/user?passportID='+id;
 		testLogger.innerText = requestToServer(url);
-		formClear();
+		/*formClear();*/
 	};
 
 
@@ -117,12 +116,12 @@
 		}
 	};
 
-	function formClear() {
+	/*function formClear() {
 		var inputs = document.getElementsByClassName("form-control");
 		for (var i = 0; i < inputs.length; i++) {
 			inputs[i].value = "";
 		}
-	}
+	}*/
 
 
 

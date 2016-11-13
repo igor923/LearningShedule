@@ -129,6 +129,26 @@ app.get('/*', function (getReq, getRes) {
             getRes.sendfile("index.html");
             break
         }
+        ///////////////////////
+        case '/au':
+        {
+            getReq.on('end',function(){
+                var name = getReq.query.name;
+                var pass = getReq.query.pass;
+                var sqlScript = 'select pass from auth where name=?';
+                var result;
+                connection.query(sqlScript, name ,function (err,sqlRes) {
+                    if(err) result =  'not ok';
+                     result =  'ok';
+
+                    console.log(sqlRes);
+                    getRes.end(result);
+
+                } )
+            });
+        break;
+        }
+        //////////////////////
         default:
         {
             getRes.sendfile(getReq.path.replace('/', ''));
