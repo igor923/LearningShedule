@@ -132,6 +132,34 @@ app.get('/*', function (getReq, getRes) {
             getRes.sendfile("index.html");
             break
         }
+        ///////////////////////
+        case '/au':
+        {
+            getReq.on('end',function(){
+                var name = getReq.query.name;
+                var pass = getReq.query.pass;
+                var sqlScript = 'select pass from auth where name=?';
+                var result;
+                connection.query(sqlScript, name ,function (err,sqlRes) {
+                    if(sqlRes.length !==0) {
+                        if (pass === sqlRes[0].pass) result = 'ok';
+                        else if (pass !== sqlRes[0].pass) result = 'password is incorrect';
+                    }
+                    else if(sqlRes.length ===0) result = 'does not exist such user name';
+                    else if (err) {
+                        console.log(err);
+                        result.status = 'error';
+                        result.reason = 'insert failed';
+                        result.fullErrorText = err;
+                    }
+                    console.log(sqlRes); //>>>[0].pass
+                    getRes.end(result);
+
+                } )
+            });
+        break;
+        }
+        //////////////////////
         default:
         {
             getRes.sendfile(getReq.path.replace('/', ''));

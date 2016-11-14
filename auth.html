@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>auth</title>
+    <script src="imports/jquery-3.1.1.min.js"></script>
+    <script src="imports/core.js"></script>
+    <script src="imports/md5.js"></script>
+
+</head>
+<body>
+<div class="wrapper">
+    <input type="text" id="user">
+    <input type="text" id="pass">
+    <button id="submit">OK</button>
+    <button id="clear">Clear</button>
+</div>
+<script>
+    var userInput = document.getElementById('user');
+    var passInput = document.getElementById('pass');
+    var submitBtn = document.getElementById('submit');
+    var clearBtn = document.getElementById('clear');
+
+ /*   window.onload = function () {
+        //if cookies  yes return to main page
+        //else return to auth page
+    };*/
+
+
+    submitBtn.onclick = function () {
+        var pass = passInput.value;
+        var user = userInput.value;
+        var url = '/au?pass='+CryptoJS.MD5(pass).toString()+'&name='+user;
+        var response = requestToServer(url);
+       if(response==='ok') {
+           //window.redirect('/main');
+           alert('congratulations, u r passed!!!');
+       }
+       else if(response === 'password is incorrect') {
+          // window.redirect('/auth');
+           alert('password is incorrect!!!!!');
+       }
+       else if(response === 'does not exist such user name'){
+           alert('does not exist such user name!!!')
+       }
+    };
+
+    var requestToServer = function(url){
+        var newRequest = new XMLHttpRequest();
+        newRequest.open('GET', url, false);
+        newRequest.send();  // send something!!!
+        if(newRequest.status !== 200){
+            console.log(newRequest.status + "Error :" + newRequest.statusText);
+        }else{
+            return newRequest.responseText;
+        }
+    };
+
+
+</script>
+
+</body>
+</html>
