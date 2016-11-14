@@ -5,7 +5,7 @@ const url = require('url');
 var mysql = require('mysql');
 var app = express();
 var port = 3000;
-var headers=require('./headers');
+var headers = require('./headers');
 var dataBaseName = 'events';
 
 {
@@ -43,7 +43,9 @@ app.listen(port, function () {
 
 app.get('/*', function (getReq, getRes) {
     headers.setHeaders(getRes);
-    getReq.on('data', function (chunk) {console.log(chunk)});
+    getReq.on('data', function (chunk) {
+        console.log(chunk)
+    });
     switch (getReq.path) {
         case '/add/user':
         {
@@ -137,6 +139,6 @@ app.get('/*', function (getReq, getRes) {
     }
 });
 
-app.post('/*',function (postReq,postRes) {
-
+app.post('/*', function (postReq, postRes) {
+    console.log(postReq.body);
 });
