@@ -24,12 +24,19 @@ var dataBaseName = 'events';
         "UNIQUE `passportID`(`passportID`)" +
         ")";
 }
+{
+    var tableAuthScript = "CREATE TABLE IF NOT EXISTS `events`.`auth` ( `idAuth` INT NOT NULL AUTO_INCREMENT , `name` VARCHAR(25) NOT NULL , `pass` VARCHAR(25) NOT NULL , PRIMARY KEY (`idAuth`)) ENGINE = MyISAM;";
+}
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
     port: 3306,
     database: dataBaseName
+});
+
+connection.query(tableAuthScript, function (err, res, fields) {
+    console.log(err);
 });
 
 connection.query(tableStudentScript, function (err, res, fields) {
@@ -128,7 +135,7 @@ app.get('/*', function (getReq, getRes) {
         }
         case '/':
         {
-            console.log("Hello" + getReq.path);
+            // console.log("Hello" + getReq.path);
             getRes.sendfile("index.html");
             break
         }
@@ -140,28 +147,35 @@ app.get('/*', function (getReq, getRes) {
                 var pass = getReq.query.pass;
                 var sqlScript = 'select pass from auth where name=?';
                 var result = {};
-                connection.query(sqlScript, name, function (err, sqlRes) {
-                    if (sqlRes.length !== 0) {
+                connection.query(sqlScript, name, function (sqlErr, sqlRes) {
+                    console.log(sqlRes);
+                    if (!sqlRes) {
+                        ///
+                        console.log(sqlErr)
+                    } else if (sqlRes.length !== 0) {
                         if (pass === sqlRes[0].pass) {
                             result.status = 'ok';
                         }
                         else if (pass !== sqlRes[0].pass) {
                             result.status = 'error';
-                            result.reason = 'password is incorrect';
+                            result.reason = 'password incorrect';
                         }
                     }
                     else if (sqlRes.length === 0) {
-                        result.reason = 'does not exist such user name';
                         result.status = 'error';
+                        result.reason = 'name not found';
+
                     }
-                    else if (err) {
-                        console.log(err);
+                    else if (sqlErr) {
+                        console.log(sqlErr);
                         result.status = 'error';
                         result.reason = 'query password failed';
-                        result.fullErrorText = err;
+                        result.fullErrorText = sqlErr;
                     }
                     console.log(sqlRes); //>>>[0].pass
-                    getRes.end(result);
+                    console.log(result); //>>>[0].pass
+
+                    getRes.end(JSON.stringify(result));
                 })
             });
             break;
