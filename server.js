@@ -133,7 +133,7 @@ app.get('/*', function (getReq, getRes) {
             break
         }
         ///////////////////////
-        case '/au':
+        case '/auth':
         {
             getReq.on('end', function () {
                 var name = getReq.query.name;
