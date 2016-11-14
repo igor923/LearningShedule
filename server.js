@@ -53,98 +53,152 @@ app.get('/*', function (getReq, getRes) {
     getReq.on('data', function (chunk) {
         console.log(chunk)
     });
-    switch (getReq.path) {
-        case '/add/user':
-        {
-            console.log(getReq.query);
-            getReq.on('end', function () {
-                var firstName = getReq.query.firstName;
-                var lastName = getReq.query.lastName;
-                var passportID = getReq.query.passportID;
-                var sqlScript = 'insert into students set ?';
-                var studentSet = {
-                    idStudent: null,
-                    firstName: firstName,
-                    lastName: lastName,
-                    passportID: passportID
-                };
-                connection.query(sqlScript, studentSet, function (err, sqlRes) {
-                    var result = {};
-                    if (err) {
-                        console.log(err);
-                        result.status = 'error';
-                        result.reason = 'insert failed';
-                        result.fullErrorText = err;
-                    } else {
-                        console.log(sqlRes);
-                        result.status = 'ok';
-                        result.reason = 'new record inserted';
-                    }
-                    getRes.end(JSON.stringify(result));
+    getReq.on('end', function () {
+        switch (getReq.path) {
+            case '/add/user':
+            {
+                console.log(getReq.query);
+                getReq.on('end', function () {
+                    var firstName = getReq.query.firstName;
+                    var lastName = getReq.query.lastName;
+                    var passportID = getReq.query.passportID;
+                    var sqlScript = 'insert into students set ?';
+                    var studentSet = {
+                        idStudent: null,
+                        firstName: firstName,
+                        lastName: lastName,
+                        passportID: passportID
+                    };
+                    connection.query(sqlScript, studentSet, function (err, sqlRes) {
+                        var result = {};
+                        if (err) {
+                            console.log(err);
+                            result.status = 'error';
+                            result.reason = 'insert failed';
+                            result.fullErrorText = err;
+                        } else {
+                            console.log(sqlRes);
+                            result.status = 'ok';
+                            result.reason = 'new record inserted';
+                        }
+                        getRes.end(JSON.stringify(result));
+                    });
                 });
-            });
-            break;
-        }
-        case '/get/users':
-        {
+                break;
+            }
+            case '/get/users':
+            {
 
-            getReq.on('end', function () {
-                var sqlScript = 'select * from students ';
-                connection.query(sqlScript, {}, function (err, sqlRes) {
-                    var result = {};
-                    if (err) {
-                        console.log(err);
-                        result.status = 'error';
-                        result.reason = 'select failed';
-                        result.fullErrorText = err;
-                    } else {
-                        console.log(sqlRes);
-                        result.status = 'ok';
-                        result.reason = 'select done';
-                        result.students = sqlRes;
-                    }
-                    getRes.end(JSON.stringify(result));
+                getReq.on('end', function () {
+                    var sqlScript = 'select * from students ';
+                    connection.query(sqlScript, {}, function (err, sqlRes) {
+                        var result = {};
+                        if (err) {
+                            console.log(err);
+                            result.status = 'error';
+                            result.reason = 'select failed';
+                            result.fullErrorText = err;
+                        } else {
+                            console.log(sqlRes);
+                            result.status = 'ok';
+                            result.reason = 'select done';
+                            result.students = sqlRes;
+                        }
+                        getRes.end(JSON.stringify(result));
+                    });
                 });
-            });
-            break;
-        }
-        case '/del/user':
-        {
-            getReq.on('end', function () {
-                passportID = getReq.query.passportID;
-                var sqlScript = 'delete from students where passportID = ?';
-                connection.query(sqlScript, passportID, function (err, sqlRes) {
-                    var result = {};
-                    if (err) {
-                        console.log(err);
-                        result.status = 'error';
-                        result.reason = 'insert failed';
-                        result.fullErrorText = err;
-                    } else if (sqlRes.affectedRows != 0) {
-                        result.status = 'ok';
-                        result.reason = 'record deleted';
-                    } else if (sqlRes.affectedRows == 0) {
-                        result.status = 'warning';
-                        result.reason = 'record not found';
-                    }
+                break;
+            }
+            case '/del/user':
+            {
+                getReq.on('end', function () {
+                    passportID = getReq.query.passportID;
+                    var sqlScript = 'delete from students where passportID = ?';
+                    connection.query(sqlScript, passportID, function (err, sqlRes) {
+                        var result = {};
+                        if (err) {
+                            console.log(err);
+                            result.status = 'error';
+                            result.reason = 'insert failed';
+                            result.fullErrorText = err;
+                        } else if (sqlRes.affectedRows != 0) {
+                            result.status = 'ok';
+                            result.reason = 'record deleted';
+                        } else if (sqlRes.affectedRows == 0) {
+                            result.status = 'warning';
+                            result.reason = 'record not found';
+                        }
 
-                    getRes.end(JSON.stringify(result));
+                        getRes.end(JSON.stringify(result));
+                    });
                 });
-            });
-            break;
-        }
-        case '/':
-        {
-            // console.log("Hello" + getReq.path);
-            getRes.sendfile("index.html");
-            break
-        }
-        ///////////////////////
-        case '/auth':
-        {
-            getReq.on('end', function () {
+                break;
+            }
+            case '/':
+            {
+                // console.log("Hello" + getReq.path);
+                getRes.sendfile("index.html");
+                break
+            }
+            ///////////////////////
+            case '/auth':
+            {
                 var name = getReq.query.name;
                 var pass = getReq.query.pass;
+                var sqlScript = 'select pass from auth where name=?';
+                var result = {};
+                connection.query(sqlScript, name, function (sqlErr, sqlRes) {
+                    console.log(sqlRes);
+                    if (!sqlRes) {
+                        ///
+                        console.log(sqlErr)
+                    } else if (sqlRes.length !== 0) {
+                        if (pass === sqlRes[0].pass) {
+                            result.status = 'ok';
+                        }
+                        else if (pass !== sqlRes[0].pass) {
+                            result.status = 'error';
+                            result.reason = 'password incorrect';
+                        }
+                    }
+                    else if (sqlRes.length === 0) {
+                        result.status = 'error';
+                        result.reason = 'name not found';
+                    }
+                    else if (sqlErr) {
+                        console.log(sqlErr);
+                        result.status = 'error';
+                        result.reason = 'query password failed';
+                        result.fullErrorText = sqlErr;
+                    }
+                    console.log(sqlRes); //>>>[0].pass
+                    console.log(result); //>>>[0].pass
+                    getRes.end(JSON.stringify(result));
+                });
+                break;
+            }
+            //////////////////////
+            default:
+            {
+                getRes.sendfile(getReq.path.replace('/', ''));
+            }
+        }
+    });
+});
+
+app.post('/*', function (postReq, postRes) {
+    var postData = '';
+    postReq.on("data", function (chunk) {
+        postData = postData + chunk;
+    });
+    postReq.on("end", function () {
+        console.log(postData);
+        switch (postReq.path) {
+            case '/auth':
+            {
+                // postReq.on('end', function () {
+                var name = postReq.query.name;
+                var pass = postReq.query.pass;
                 var sqlScript = 'select pass from auth where name=?';
                 var result = {};
                 connection.query(sqlScript, name, function (sqlErr, sqlRes) {
@@ -175,19 +229,14 @@ app.get('/*', function (getReq, getRes) {
                     console.log(sqlRes); //>>>[0].pass
                     console.log(result); //>>>[0].pass
 
-                    getRes.end(JSON.stringify(result));
-                })
-            });
-            break;
+                    postRes.end(JSON.stringify(result));
+                });
+                // });
+                break;
+            }
+            default:
+            {
+            }
         }
-        //////////////////////
-        default:
-        {
-            getRes.sendfile(getReq.path.replace('/', ''));
-        }
-    }
-});
-
-app.post('/*', function (postReq, postRes) {
-    console.log(postReq.body);
+    });
 });
