@@ -1,7 +1,7 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var http = require("http");
-const url = require('url');
+var url = require('url');
 var mysql = require('mysql');
 var app = express();
 var port = 3000;
@@ -9,6 +9,23 @@ var headers = require('./headers');
 var dataBaseName = 'events';
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+app.use("/*", function (req, res, next) {
+
+    var bodyStringData = '';
+    req.on("data", function (chunk) {
+        bodyStringData = bodyStringData + chunk;
+    });
+    req.on("end", function () {
+        res.bodyStringData = bodyStringData;
+        if (res.bodyStringData) {
+            res.bodyData = JSON.parse(res.bodyStringData);
+        }
+    });
+
+
+    headers.setHeaders(res);
+    next();
+});
 
 
 {
@@ -37,11 +54,9 @@ var connection = mysql.createConnection({
     port: 3306,
     database: dataBaseName
 });
-
 connection.query(tableAuthScript, function (err, res, fields) {
     console.log(err);
 });
-
 connection.query(tableStudentScript, function (err, res, fields) {
     console.log(err);
 });
@@ -183,18 +198,24 @@ app.get('/*', function (getReq, getRes) {
     });
 });
 app.post('/*', function (postReq, postRes) {
-    var postData = '';
-    postReq.on("data", function (chunk) {
-        postData = postData + chunk;
-        // console.log(postData);
-    });
+
+    //
+    // var postData = '';
+    // postReq.on("data", function (chunk) {
+    //     postData = postData + chunk;
+    //     // console.log(postData);
+    // });
+
+
     postReq.on("end", function () {
-        var postBody = JSON.parse(postData);
+
+        // console.log("MIDDLE", postRes.bodyStringData);
+        // var postBody = JSON.parse(postData);
         switch (postReq.path) {
             case '/auth/user':
             {
-                var name = postBody.name;
-                var pass = postBody.pass;
+                var name = postRes.bodyData.name;
+                var pass = postRes.bodyData.pass;
                 var sqlScript = 'select pass from auth where ?';
                 var result = {};
                 connection.query(sqlScript, {name: name}, function (sqlErr, sqlRes) {
@@ -227,6 +248,38 @@ app.post('/*', function (postReq, postRes) {
                 // });
                 break;
             }
+            case '/role/user':
+            {
+                console.log('/role/user');
+                name = postRes.bodyData.name;
+                console.log(name);
+                sqlScript = 'select roleName from roles  ' +
+                    'where idRole=(select idRole from users where ?)';
+                result = {};
+                connection.query(sqlScript, {name: name}, function (sqlErr, sqlRes) {
+                    if (!sqlRes) {
+                        console.log(sqlErr)
+                    } else if (sqlRes.length !== 0) {
+                        result.status = 'ok';
+                        result.role = sqlRes[0].roleName;
+                    }
+                    else if (sqlRes.length === 0) {
+                        result.status = 'error';
+                        result.reason = 'name not found';
+                    }
+                    else if (sqlErr) {
+                        console.log(sqlErr);
+                        result.status = 'error';
+                        result.reason = 'query failed';
+                        result.fullErrorText = sqlErr;
+                    }
+                    console.log(result);
+                    postRes.end(JSON.stringify(result));
+                });
+                // });
+                break;
+            }
+
             default:
             {
             }
