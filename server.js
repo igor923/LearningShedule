@@ -7,6 +7,9 @@ var app = express();
 var port = 3000;
 var headers = require('./headers');
 var dataBaseName = 'events';
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
 
 {
     var tableStudentScript = "" +
@@ -42,19 +45,22 @@ connection.query(tableAuthScript, function (err, res, fields) {
 connection.query(tableStudentScript, function (err, res, fields) {
     console.log(err);
 });
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
 app.listen(port, function () {
     console.log("Started on PORT " + port);
 });
-
 app.get('/*', function (getReq, getRes) {
     headers.setHeaders(getRes);
     getReq.on('data', function (chunk) {
         console.log(chunk)
     });
-    getReq.on('end', function () {
+    getReq.on('end', function (getData) {
         switch (getReq.path) {
+            case '/':
+            {
+                // console.log("Hello" + getReq.path);
+                getRes.sendfile("index.html");
+                break
+            }
             case '/add/user':
             {
                 console.log(getReq.query);
@@ -88,7 +94,6 @@ app.get('/*', function (getReq, getRes) {
             }
             case '/get/users':
             {
-
                 getReq.on('end', function () {
                     var sqlScript = 'select * from students ';
                     connection.query(sqlScript, {}, function (err, sqlRes) {
@@ -134,14 +139,7 @@ app.get('/*', function (getReq, getRes) {
                 });
                 break;
             }
-            case '/':
-            {
-                // console.log("Hello" + getReq.path);
-                getRes.sendfile("index.html");
-                break
-            }
-            ///////////////////////
-            case '/auth':
+            case '/auth/user':
             {
                 var name = getReq.query.name;
                 var pass = getReq.query.pass;
@@ -177,7 +175,6 @@ app.get('/*', function (getReq, getRes) {
                 });
                 break;
             }
-            //////////////////////
             default:
             {
                 getRes.sendfile(getReq.path.replace('/', ''));
@@ -185,26 +182,23 @@ app.get('/*', function (getReq, getRes) {
         }
     });
 });
-
 app.post('/*', function (postReq, postRes) {
     var postData = '';
     postReq.on("data", function (chunk) {
         postData = postData + chunk;
+        // console.log(postData);
     });
     postReq.on("end", function () {
-        console.log(postData);
+        var postBody = JSON.parse(postData);
         switch (postReq.path) {
-            case '/auth':
+            case '/auth/user':
             {
-                // postReq.on('end', function () {
-                var name = postReq.query.name;
-                var pass = postReq.query.pass;
-                var sqlScript = 'select pass from auth where name=?';
+                var name = postBody.name;
+                var pass = postBody.pass;
+                var sqlScript = 'select pass from auth where ?';
                 var result = {};
-                connection.query(sqlScript, name, function (sqlErr, sqlRes) {
-                    console.log(sqlRes);
+                connection.query(sqlScript, {name: name}, function (sqlErr, sqlRes) {
                     if (!sqlRes) {
-                        ///
                         console.log(sqlErr)
                     } else if (sqlRes.length !== 0) {
                         if (pass === sqlRes[0].pass) {
@@ -228,7 +222,6 @@ app.post('/*', function (postReq, postRes) {
                     }
                     console.log(sqlRes); //>>>[0].pass
                     console.log(result); //>>>[0].pass
-
                     postRes.end(JSON.stringify(result));
                 });
                 // });
