@@ -1,0 +1,30 @@
+week{
+  day{
+  time{
+},
+time{
+},
+time{
+}
+...
+},
+day{
+time{
+teacher: teacher
+class: class
+subject: subject
+},
+time{
+teacher: teacher
+class: class
+subject: subject
+},
+time{
+teacher: teacher
+class: class
+subject:subject
+}
+...
+}
+...
+}

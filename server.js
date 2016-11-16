@@ -26,8 +26,6 @@ app.use("/*", function (req, res, next) {
     headers.setHeaders(res);
     next();
 });
-
-
 {
     var tableStudentScript = "" +
         "CREATE TABLE IF NOT EXISTS `" +
@@ -198,26 +196,19 @@ app.get('/*', function (getReq, getRes) {
     });
 });
 app.post('/*', function (postReq, postRes) {
-
-    //
-    // var postData = '';
-    // postReq.on("data", function (chunk) {
-    //     postData = postData + chunk;
-    //     // console.log(postData);
-    // });
-
-
     postReq.on("end", function () {
 
         // console.log("MIDDLE", postRes.bodyStringData);
         // var postBody = JSON.parse(postData);
+        console.log(postReq.path);
+        console.log(postRes.bodyData);
+        var result = {};
         switch (postReq.path) {
             case '/auth/user':
             {
                 var name = postRes.bodyData.name;
                 var pass = postRes.bodyData.pass;
                 var sqlScript = 'select pass from auth where ?';
-                var result = {};
                 connection.query(sqlScript, {name: name}, function (sqlErr, sqlRes) {
                     if (!sqlRes) {
                         console.log(sqlErr)
@@ -233,7 +224,6 @@ app.post('/*', function (postReq, postRes) {
                     else if (sqlRes.length === 0) {
                         result.status = 'error';
                         result.reason = 'name not found';
-
                     }
                     else if (sqlErr) {
                         console.log(sqlErr);
@@ -245,17 +235,13 @@ app.post('/*', function (postReq, postRes) {
                     console.log(result); //>>>[0].pass
                     postRes.end(JSON.stringify(result));
                 });
-                // });
                 break;
             }
             case '/role/user':
             {
-                console.log('/role/user');
                 name = postRes.bodyData.name;
-                console.log(name);
                 sqlScript = 'select roleName from roles  ' +
                     'where idRole=(select idRole from users where ?)';
-                result = {};
                 connection.query(sqlScript, {name: name}, function (sqlErr, sqlRes) {
                     if (!sqlRes) {
                         console.log(sqlErr)
@@ -268,21 +254,78 @@ app.post('/*', function (postReq, postRes) {
                         result.reason = 'name not found';
                     }
                     else if (sqlErr) {
-                        console.log(sqlErr);
                         result.status = 'error';
                         result.reason = 'query failed';
                         result.fullErrorText = sqlErr;
                     }
-                    console.log(result);
                     postRes.end(JSON.stringify(result));
                 });
                 // });
                 break;
             }
+            case '/schedule/user':
+            case '/schedule/teacher':
+            {
 
+                break;
+            }
             default:
             {
             }
         }
     });
 });
+
+///////////////////////////
+var week = {
+    days: [
+        {
+            date: date,
+            dayOfWeek: dayOfWeek,
+            lessons: [
+                {
+                    time: time,
+                    class: className,
+                    teacher: teacher,
+                    subject: subject
+                },
+                {
+                    time: time,
+                    class: className,
+                    teacher: teacher,
+                    subject: subject
+                },
+                {
+                    time: time,
+                    class: className,
+                    teacher: teacher,
+                    subject: subject
+                }
+            ]
+        },
+        {
+            date: date,
+            dayOfWeek: dayOfWeek,
+            lessons: [
+                {
+                    time: time,
+                    class: className,
+                    teacher: teacher,
+                    subject: subject
+                },
+                {
+                    time: time,
+                    class: className,
+                    teacher: teacher,
+                    subject: subject
+                },
+                {
+                    time: time,
+                    class: className,
+                    teacher: teacher,
+                    subject: subject
+                }
+            ]
+        }
+    ]
+};

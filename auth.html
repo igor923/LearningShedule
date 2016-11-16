@@ -14,46 +14,91 @@
     <input type="text" id="pass">
     <button id="submit">OK</button>
     <button id="clear">Clear</button>
+    <button id="getRoleBtn">get role</button>
 </div>
 <script>
     var userInput = document.getElementById('user');
     var passInput = document.getElementById('pass');
     var submitBtn = document.getElementById('submit');
     var clearBtn = document.getElementById('clear');
-
- /*   window.onload = function () {
-        //if cookies  yes return to main page
-        //else return to auth page
-    };*/
+    var getRoleBtn = document.getElementById('getRoleBtn');
+    /*   window.onload = function () {
+     //if cookies  yes return to main page
+     //else return to auth page
+     };*/
 
 
     submitBtn.onclick = function () {
         var pass = passInput.value;
         var user = userInput.value;
-        var url = '/au?pass='+CryptoJS.MD5(pass).toString()+'&name='+user;
-        var response = requestToServer(url);
-       if(response==='ok') {
-           //window.redirect('/main');
-           alert('congratulations, u r passed!!!');
-       }
-       else if(response === 'password is incorrect') {
-          // window.redirect('/auth');
-           alert('password is incorrect!!!!!');
-       }
-       else if(response === 'does not exist such user name'){
-           alert('does not exist such user name!!!')
-       }
+        var passMD5 = CryptoJS.MD5(pass).toString();
+        console.log(passMD5);
+        var url = '/auth/user';
+        var postBody = {
+            pass: passMD5,
+            name: user
+        };
+        var strPostBody = JSON.stringify(postBody);
+        var response = requestToServerPost(url, strPostBody);
+        if (response.status === 'ok') {
+            console.log('response:', response);
+        }
+        else if (response.status === 'error') {
+            console.log('response:', response);
+
+        }
+    };
+    getRoleBtn.onclick = function () {
+        var user = userInput.value;
+        var url = '/role/user';
+        var postBody = {
+            name: user
+        };
+        var strPostBody = JSON.stringify(postBody);
+        var response = requestToServerPost(url, strPostBody);
+        if (response.status === 'ok') {
+            console.log('response:', response);
+        }
+        else if (response.status === 'error') {
+            console.log('response:', response);
+
+        }
     };
 
-    var requestToServer = function(url){
+    //    var requestToServer = function (url) {
+    //        var newRequest = new XMLHttpRequest();
+    //        newRequest.open('GET', url, false);
+    //        newRequest.send();  // send something!!!
+    //        if (newRequest.status !== 200) {
+    //            console.log(newRequest.status + "Error :" + newRequest.statusText);
+    //        } else {
+    //            return newRequest.responseText;
+    //        }
+    //    };
+
+    var requestToServerPost = function (url, postBody) {
+        console.log(postBody);
         var newRequest = new XMLHttpRequest();
-        newRequest.open('GET', url, false);
-        newRequest.send();  // send something!!!
-        if(newRequest.status !== 200){
-            console.log(newRequest.status + "Error :" + newRequest.statusText);
-        }else{
-            return newRequest.responseText;
-        }
+        newRequest.open('POST', url, true);
+        newRequest.send(postBody);  // send something!!!
+
+        return newRequest.onreadystatechange = function (status) {
+            if (newRequest.readyState != 4) {
+                return;
+            }
+            console.log(newRequest.response);
+            if (newRequest.status === 200) {
+                return newRequest.responseText;
+            }
+        };
+
+//        console.log("100500");
+//        newRequest.send(postBody);  // send something!!!
+//        if (newRequest.status !== 200) {
+//            console.log(newRequest.status + "Error :" + newRequest.statusText);
+//        } else {
+//            return newRequest.responseText;
+//        }
     };
 
 
