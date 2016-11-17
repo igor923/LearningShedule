@@ -4,8 +4,19 @@
     <meta charset="UTF-8">
     <title>auth</title>
     <script src="imports/jquery-3.1.1.min.js"></script>
+    <script src="imports/jquery-ui.js"></script>
+
     <script src="imports/core.js"></script>
     <script src="imports/md5.js"></script>
+    <style type="text/css">
+        *{
+            transition: 1s;
+        }
+
+        .red {
+            border-color: #ff0000;
+        }
+    </style>
 
 </head>
 <body>
@@ -28,23 +39,20 @@
             name: user
         };
         var strPostBody = JSON.stringify(postBody);
-        var response = requestToServerPost(url, strPostBody)
-        console.log('response: ' + response);
-        if (response.status === 'ok') {
-            console.log('response:' + response.responseText);
-            alert('ok!');
-        }
-        else if (response.status === 'error') {
-            console.log('response:', response);
-
-        }
+        requestToServerPost(url, strPostBody);
     });
 
     var requestToServerPost = function (url, postBody) {
 
-      $.post(url,postBody,  function (data) {
-                      console.log('data:' + data);    //>>> here response from server - 'data'
-   });
+        $.post(url, postBody, function (data) {
+            $('input').removeClass('red');
+            console.log('data:' + data);    //>>> here response from server - 'data'
+            var result = JSON.parse(data);
+            if (result.status != 'ok') {
+                console.log($(result.field));
+                $(result.field).addClass("red");
+            }
+        });
 
     };
 

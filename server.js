@@ -226,11 +226,13 @@ app.post('/*', function (postReq, postRes) {
                         }
                         else if (pass !== sqlRes[0].pass) {
                             result.status = 'error';
+                            result.field = '#pass';
                             result.reason = 'password incorrect';
                         }
                     }
                     else if (sqlRes.length === 0) {
                         result.status = 'error';
+                        result.field = '#user';
                         result.reason = 'name not found';
                     }
                     else if (sqlErr) {
