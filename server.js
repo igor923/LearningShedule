@@ -7,22 +7,25 @@ var app = express();
 var port = 3000;
 var headers = require('./headers');
 var dataBaseName = 'events';
+/*
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+*/
+
 app.use("/*", function (req, res, next) {
 
     var bodyStringData = '';
     req.on("data", function (chunk) {
+
         bodyStringData = bodyStringData + chunk;
     });
     req.on("end", function () {
+        console.log(bodyStringData);
         res.bodyStringData = bodyStringData;
         if (res.bodyStringData) {
             res.bodyData = JSON.parse(res.bodyStringData);
         }
     });
-
-
     headers.setHeaders(res);
     next();
 });
@@ -43,7 +46,7 @@ app.use("/*", function (req, res, next) {
         ")";
 }
 {
-    var tableAuthScript = "CREATE TABLE IF NOT EXISTS `events`.`auth` ( `idAuth` INT NOT NULL AUTO_INCREMENT , `name` VARCHAR(25) NOT NULL , `pass` VARCHAR(25) NOT NULL , PRIMARY KEY (`idAuth`)) ENGINE = MyISAM;";
+    var tableAuthScript = "CREATE TABLE IF NOT EXISTS `events`.`auth` ( `idAuth` INT NOT NULL AUTO_INCREMENT , `name` VARCHAR(25) NOT NULL , `pass` VARCHAR(45) NOT NULL , PRIMARY KEY (`idAuth`)) ENGINE = MyISAM;";
 }
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -154,11 +157,12 @@ app.get('/*', function (getReq, getRes) {
             }
             case '/auth/user':
             {
+                console.log(getReq.query);
                 var name = getReq.query.name;
                 var pass = getReq.query.pass;
-                var sqlScript = 'select pass from auth where name=?';
+                var sqlScript = 'select pass from auth where ?';
                 var result = {};
-                connection.query(sqlScript, name, function (sqlErr, sqlRes) {
+                connection.query(sqlScript, {name:name}, function (sqlErr, sqlRes) {
                     console.log(sqlRes);
                     if (!sqlRes) {
                         ///
@@ -182,9 +186,9 @@ app.get('/*', function (getReq, getRes) {
                         result.reason = 'query password failed';
                         result.fullErrorText = sqlErr;
                     }
-                    console.log(sqlRes); //>>>[0].pass
-                    console.log(result); //>>>[0].pass
-                    getRes.end(JSON.stringify(result));
+                    console.log(sqlRes);
+                    console.log(result);
+                    getRes.end(JSON.stringify(result)); // <<< we need to send role, what say's that result is ok?
                 });
                 break;
             }
@@ -195,6 +199,9 @@ app.get('/*', function (getReq, getRes) {
         }
     });
 });
+
+//       <<<<<<<<<<<<POST>>>>>>>>>>>>>>>>>>
+
 app.post('/*', function (postReq, postRes) {
     postReq.on("end", function () {
 
@@ -215,6 +222,7 @@ app.post('/*', function (postReq, postRes) {
                     } else if (sqlRes.length !== 0) {
                         if (pass === sqlRes[0].pass) {
                             result.status = 'ok';
+                            console.log('ok');
                         }
                         else if (pass !== sqlRes[0].pass) {
                             result.status = 'error';
@@ -271,12 +279,14 @@ app.post('/*', function (postReq, postRes) {
             }
             default:
             {
+                console.log("default");
             }
         }
     });
 });
 
 ///////////////////////////
+/*
 var week = {
     days: [
         {
@@ -329,3 +339,4 @@ var week = {
         }
     ]
 };
+*/
