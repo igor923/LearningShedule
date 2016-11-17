@@ -43,7 +43,6 @@
     });
 
     var requestToServerPost = function (url, postBody) {
-
         $.post(url, postBody, function (data) {
             $('input').removeClass('red');
             console.log('data:' + data);    //>>> here response from server - 'data'
@@ -53,29 +52,7 @@
                 $(result.field).addClass("red");
             }
         });
-
     };
-
-
-    /*
-     $('#getRoleBtn').click(function () {
-     var user = userInput.value;
-     var url = '/role/user';
-     var postBody = {
-     name: user
-     };
-     var strPostBody = JSON.stringify(postBody);
-     var response = requestToServerPost(url, strPostBody);
-     if (response.status === 'ok') {
-     console.log('response:', response);
-     }
-     else if (response.status === 'error') {
-     console.log('response:', response);
-
-     }
-     });
-     */
-
 </script>
 
 </body>
