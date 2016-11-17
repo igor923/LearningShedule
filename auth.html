@@ -5,11 +5,14 @@
     <title>auth</title>
     <script src="imports/jquery-3.1.1.min.js"></script>
     <script src="imports/jquery-ui.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.14.0.css">
+    <script src="http://code.jquery.com/qunit/qunit-1.14.0.js"></script>
+    <script src="imports/jquery.cookie.js"></script>
 
     <script src="imports/core.js"></script>
     <script src="imports/md5.js"></script>
     <style type="text/css">
-        *{
+        * {
             transition: 1s;
         }
 
@@ -50,6 +53,9 @@
             if (result.status != 'ok') {
                 console.log($(result.field));
                 $(result.field).addClass("red");
+            }
+            if (result.token) {
+                $.cookie("token", result.token);
             }
         });
     };

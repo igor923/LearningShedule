@@ -7,10 +7,14 @@ var app = express();
 var port = 3000;
 var headers = require('./headers');
 var dataBaseName = 'events';
+var randtoken = require('rand-token');
+var uid = require('rand-token').uid;
+
+
 /*
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
-*/
+ app.use(bodyParser.urlencoded({extended: false}));
+ app.use(bodyParser.json());
+ */
 
 app.use("/*", function (req, res, next) {
 
@@ -48,6 +52,7 @@ app.use("/*", function (req, res, next) {
 {
     var tableAuthScript = "CREATE TABLE IF NOT EXISTS `events`.`auth` ( `idAuth` INT NOT NULL AUTO_INCREMENT , `name` VARCHAR(25) NOT NULL , `pass` VARCHAR(45) NOT NULL , PRIMARY KEY (`idAuth`)) ENGINE = MyISAM;";
 }
+
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -162,7 +167,7 @@ app.get('/*', function (getReq, getRes) {
                 var pass = getReq.query.pass;
                 var sqlScript = 'select pass from auth where ?';
                 var result = {};
-                connection.query(sqlScript, {name:name}, function (sqlErr, sqlRes) {
+                connection.query(sqlScript, {name: name}, function (sqlErr, sqlRes) {
                     console.log(sqlRes);
                     if (!sqlRes) {
                         ///
@@ -222,6 +227,8 @@ app.post('/*', function (postReq, postRes) {
                     } else if (sqlRes.length !== 0) {
                         if (pass === sqlRes[0].pass) {
                             result.status = 'ok';
+                            result.token = uid(16);
+
                             console.log('ok');
                         }
                         else if (pass !== sqlRes[0].pass) {
@@ -289,56 +296,56 @@ app.post('/*', function (postReq, postRes) {
 
 ///////////////////////////
 /*
-var week = {
-    days: [
-        {
-            date: date,
-            dayOfWeek: dayOfWeek,
-            lessons: [
-                {
-                    time: time,
-                    class: className,
-                    teacher: teacher,
-                    subject: subject
-                },
-                {
-                    time: time,
-                    class: className,
-                    teacher: teacher,
-                    subject: subject
-                },
-                {
-                    time: time,
-                    class: className,
-                    teacher: teacher,
-                    subject: subject
-                }
-            ]
-        },
-        {
-            date: date,
-            dayOfWeek: dayOfWeek,
-            lessons: [
-                {
-                    time: time,
-                    class: className,
-                    teacher: teacher,
-                    subject: subject
-                },
-                {
-                    time: time,
-                    class: className,
-                    teacher: teacher,
-                    subject: subject
-                },
-                {
-                    time: time,
-                    class: className,
-                    teacher: teacher,
-                    subject: subject
-                }
-            ]
-        }
-    ]
-};
-*/
+ var week = {
+ days: [
+ {
+ date: date,
+ dayOfWeek: dayOfWeek,
+ lessons: [
+ {
+ time: time,
+ class: className,
+ teacher: teacher,
+ subject: subject
+ },
+ {
+ time: time,
+ class: className,
+ teacher: teacher,
+ subject: subject
+ },
+ {
+ time: time,
+ class: className,
+ teacher: teacher,
+ subject: subject
+ }
+ ]
+ },
+ {
+ date: date,
+ dayOfWeek: dayOfWeek,
+ lessons: [
+ {
+ time: time,
+ class: className,
+ teacher: teacher,
+ subject: subject
+ },
+ {
+ time: time,
+ class: className,
+ teacher: teacher,
+ subject: subject
+ },
+ {
+ time: time,
+ class: className,
+ teacher: teacher,
+ subject: subject
+ }
+ ]
+ }
+ ]
+ };
+ */
