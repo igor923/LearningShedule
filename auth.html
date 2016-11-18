@@ -24,7 +24,9 @@
 </head>
 <body>
 
+
 <div class="wrapper">
+    <div id="token">dfdfd</div>
     <input type="text" id="user">
     <input type="text" id="pass">
     <button id="submit">OK</button>
@@ -32,7 +34,8 @@
     <button id="getRoleBtn">get role</button>
 </div>
 <script>
-
+    //    console.log("prev coookie ",);
+    $("#token").text($.cookie("token"));
     $('#submit').click(function () {
         var passMD5 = CryptoJS.MD5($('#pass').val()).toString();
         var user = $('#user').val();
@@ -56,6 +59,7 @@
             }
             if (result.token) {
                 $.cookie("token", result.token);
+
             }
         });
     };
