@@ -9,18 +9,14 @@ var headers = require('./headers');
 var dataBaseName = 'events';
 var randtoken = require('rand-token');
 var uid = require('rand-token').uid;
+var sqlCreators = require('./sqlCreators');
 
-
-/*
- app.use(bodyParser.urlencoded({extended: false}));
- app.use(bodyParser.json());
- */
+console.log(sqlCreators.sqlCreators());
 
 app.use("/*", function (req, res, next) {
 
     var bodyStringData = '';
     req.on("data", function (chunk) {
-
         bodyStringData = bodyStringData + chunk;
     });
     req.on("end", function () {
@@ -33,26 +29,6 @@ app.use("/*", function (req, res, next) {
     headers.setHeaders(res);
     next();
 });
-{
-    var tableStudentScript = "" +
-        "CREATE TABLE IF NOT EXISTS `" +
-        'students' +
-        "` (    " +
-        "`idStudent` int UNSIGNED AUTO_INCREMENT,    " +
-        "`firstName` varchar(35) DEFAULT NULL,    " +
-        "`lastName` varchar(50) DEFAULT NULL,    " +
-        "`phone` varchar(20) DEFAULT NULL,    " +
-        "`e-mail` varchar(255) DEFAULT NULL,    " +
-        "`address` varchar(255) DEFAULT NULL,    " +
-        "`passportID` int(11) DEFAULT NULL," +
-        "PRIMARY KEY (`idStudent`)," +
-        "UNIQUE `passportID`(`passportID`)" +
-        ")";
-}
-{
-    var tableAuthScript = "CREATE TABLE IF NOT EXISTS `events`.`auth` ( `idAuth` INT NOT NULL AUTO_INCREMENT , `name` VARCHAR(25) NOT NULL , `pass` VARCHAR(45) NOT NULL , PRIMARY KEY (`idAuth`)) ENGINE = MyISAM;";
-}
-
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -60,12 +36,11 @@ var connection = mysql.createConnection({
     port: 3306,
     database: dataBaseName
 });
-connection.query(tableAuthScript, function (err, res, fields) {
-    console.log(err);
-});
-connection.query(tableStudentScript, function (err, res, fields) {
-    console.log(err);
-});
+
+// connection.query(tableAuthScript, function (err, res, fields) {console.log(err);});
+// connection.query(tableStudentScript, function (err, res, fields) {console.log(err);});
+
+
 app.listen(port, function () {
     console.log("Started on PORT " + port);
 });
@@ -82,121 +57,121 @@ app.get('/*', function (getReq, getRes) {
                 getRes.sendfile("index.html");
                 break
             }
-            case '/add/user':
-            {
-                console.log(getReq.query);
-                getReq.on('end', function () {
-                    var firstName = getReq.query.firstName;
-                    var lastName = getReq.query.lastName;
-                    var passportID = getReq.query.passportID;
-                    var sqlScript = 'insert into students set ?';
-                    var studentSet = {
-                        idStudent: null,
-                        firstName: firstName,
-                        lastName: lastName,
-                        passportID: passportID
-                    };
-                    connection.query(sqlScript, studentSet, function (err, sqlRes) {
-                        var result = {};
-                        if (err) {
-                            console.log(err);
-                            result.status = 'error';
-                            result.reason = 'insert failed';
-                            result.fullErrorText = err;
-                        } else {
-                            console.log(sqlRes);
-                            result.status = 'ok';
-                            result.reason = 'new record inserted';
-                        }
-                        getRes.end(JSON.stringify(result));
-                    });
-                });
-                break;
-            }
-            case '/get/users':
-            {
-                getReq.on('end', function () {
-                    var sqlScript = 'select * from students ';
-                    connection.query(sqlScript, {}, function (err, sqlRes) {
-                        var result = {};
-                        if (err) {
-                            console.log(err);
-                            result.status = 'error';
-                            result.reason = 'select failed';
-                            result.fullErrorText = err;
-                        } else {
-                            console.log(sqlRes);
-                            result.status = 'ok';
-                            result.reason = 'select done';
-                            result.students = sqlRes;
-                        }
-                        getRes.end(JSON.stringify(result));
-                    });
-                });
-                break;
-            }
-            case '/del/user':
-            {
-                getReq.on('end', function () {
-                    passportID = getReq.query.passportID;
-                    var sqlScript = 'delete from students where passportID = ?';
-                    connection.query(sqlScript, passportID, function (err, sqlRes) {
-                        var result = {};
-                        if (err) {
-                            console.log(err);
-                            result.status = 'error';
-                            result.reason = 'insert failed';
-                            result.fullErrorText = err;
-                        } else if (sqlRes.affectedRows != 0) {
-                            result.status = 'ok';
-                            result.reason = 'record deleted';
-                        } else if (sqlRes.affectedRows == 0) {
-                            result.status = 'warning';
-                            result.reason = 'record not found';
-                        }
-
-                        getRes.end(JSON.stringify(result));
-                    });
-                });
-                break;
-            }
-            case '/auth/user':
-            {
-                console.log(getReq.query);
-                var name = getReq.query.name;
-                var pass = getReq.query.pass;
-                var sqlScript = 'select pass from auth where ?';
-                var result = {};
-                connection.query(sqlScript, {name: name}, function (sqlErr, sqlRes) {
-                    console.log(sqlRes);
-                    if (!sqlRes) {
-                        ///
-                        console.log(sqlErr)
-                    } else if (sqlRes.length !== 0) {
-                        if (pass === sqlRes[0].pass) {
-                            result.status = 'ok';
-                        }
-                        else if (pass !== sqlRes[0].pass) {
-                            result.status = 'error';
-                            result.reason = 'password incorrect';
-                        }
-                    }
-                    else if (sqlRes.length === 0) {
-                        result.status = 'error';
-                        result.reason = 'name not found';
-                    }
-                    else if (sqlErr) {
-                        console.log(sqlErr);
-                        result.status = 'error';
-                        result.reason = 'query password failed';
-                        result.fullErrorText = sqlErr;
-                    }
-                    console.log(sqlRes);
-                    console.log(result);
-                    getRes.end(JSON.stringify(result)); // <<< we need to send role, what say's that result is ok?
-                });
-                break;
-            }
+            // case '/add/user':
+            // {
+            //     console.log(getReq.query);
+            //     getReq.on('end', function () {
+            //         var firstName = getReq.query.firstName;
+            //         var lastName = getReq.query.lastName;
+            //         var passportID = getReq.query.passportID;
+            //         var sqlScript = 'insert into students set ?';
+            //         var studentSet = {
+            //             idStudent: null,
+            //             firstName: firstName,
+            //             lastName: lastName,
+            //             passportID: passportID
+            //         };
+            //         connection.query(sqlScript, studentSet, function (err, sqlRes) {
+            //             var result = {};
+            //             if (err) {
+            //                 console.log(err);
+            //                 result.status = 'error';
+            //                 result.reason = 'insert failed';
+            //                 result.fullErrorText = err;
+            //             } else {
+            //                 console.log(sqlRes);
+            //                 result.status = 'ok';
+            //                 result.reason = 'new record inserted';
+            //             }
+            //             getRes.end(JSON.stringify(result));
+            //         });
+            //     });
+            //     break;
+            // }
+            // case '/get/users':
+            // {
+            //     getReq.on('end', function () {
+            //         var sqlScript = 'select * from students ';
+            //         connection.query(sqlScript, {}, function (err, sqlRes) {
+            //             var result = {};
+            //             if (err) {
+            //                 console.log(err);
+            //                 result.status = 'error';
+            //                 result.reason = 'select failed';
+            //                 result.fullErrorText = err;
+            //             } else {
+            //                 console.log(sqlRes);
+            //                 result.status = 'ok';
+            //                 result.reason = 'select done';
+            //                 result.students = sqlRes;
+            //             }
+            //             getRes.end(JSON.stringify(result));
+            //         });
+            //     });
+            //     break;
+            // }
+            // case '/del/user':
+            // {
+            //     getReq.on('end', function () {
+            //         passportID = getReq.query.passportID;
+            //         var sqlScript = 'delete from students where passportID = ?';
+            //         connection.query(sqlScript, passportID, function (err, sqlRes) {
+            //             var result = {};
+            //             if (err) {
+            //                 console.log(err);
+            //                 result.status = 'error';
+            //                 result.reason = 'insert failed';
+            //                 result.fullErrorText = err;
+            //             } else if (sqlRes.affectedRows != 0) {
+            //                 result.status = 'ok';
+            //                 result.reason = 'record deleted';
+            //             } else if (sqlRes.affectedRows == 0) {
+            //                 result.status = 'warning';
+            //                 result.reason = 'record not found';
+            //             }
+            //
+            //             getRes.end(JSON.stringify(result));
+            //         });
+            //     });
+            //     break;
+            // }
+            // case '/auth/user':
+            // {
+            //     console.log(getReq.query);
+            //     var name = getReq.query.name;
+            //     var pass = getReq.query.pass;
+            //     var sqlScript = 'select pass from auth where ?';
+            //     var result = {};
+            //     connection.query(sqlScript, {name: name}, function (sqlErr, sqlRes) {
+            //         console.log(sqlRes);
+            //         if (!sqlRes) {
+            //             ///
+            //             console.log(sqlErr)
+            //         } else if (sqlRes.length !== 0) {
+            //             if (pass === sqlRes[0].pass) {
+            //                 result.status = 'ok';
+            //             }
+            //             else if (pass !== sqlRes[0].pass) {
+            //                 result.status = 'error';
+            //                 result.reason = 'password incorrect';
+            //             }
+            //         }
+            //         else if (sqlRes.length === 0) {
+            //             result.status = 'error';
+            //             result.reason = 'name not found';
+            //         }
+            //         else if (sqlErr) {
+            //             console.log(sqlErr);
+            //             result.status = 'error';
+            //             result.reason = 'query password failed';
+            //             result.fullErrorText = sqlErr;
+            //         }
+            //         console.log(sqlRes);
+            //         console.log(result);
+            //         getRes.end(JSON.stringify(result)); // <<< we need to send role, what say's that result is ok?
+            //     });
+            //     break;
+            // }
             default:
             {
                 getRes.sendfile(getReq.path.replace('/', ''));
@@ -293,59 +268,3 @@ app.post('/*', function (postReq, postRes) {
         }
     });
 });
-
-///////////////////////////
-/*
- var week = {
- days: [
- {
- date: date,
- dayOfWeek: dayOfWeek,
- lessons: [
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- },
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- },
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- }
- ]
- },
- {
- date: date,
- dayOfWeek: dayOfWeek,
- lessons: [
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- },
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- },
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- }
- ]
- }
- ]
- };
- */
