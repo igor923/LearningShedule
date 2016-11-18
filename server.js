@@ -46,153 +46,25 @@ app.listen(port, function () {
 });
 app.get('/*', function (getReq, getRes) {
     headers.setHeaders(getRes);
-    getReq.on('data', function (chunk) {
-        console.log(chunk)
-    });
+    getReq.on('data', function (chunk) {console.log(chunk)});
     getReq.on('end', function (getData) {
         switch (getReq.path) {
-            case '/':
-            {
-                // console.log("Hello" + getReq.path);
-                getRes.sendfile("index.html");
-                break
-            }
-            // case '/add/user':
-            // {
-            //     console.log(getReq.query);
-            //     getReq.on('end', function () {
-            //         var firstName = getReq.query.firstName;
-            //         var lastName = getReq.query.lastName;
-            //         var passportID = getReq.query.passportID;
-            //         var sqlScript = 'insert into students set ?';
-            //         var studentSet = {
-            //             idStudent: null,
-            //             firstName: firstName,
-            //             lastName: lastName,
-            //             passportID: passportID
-            //         };
-            //         connection.query(sqlScript, studentSet, function (err, sqlRes) {
-            //             var result = {};
-            //             if (err) {
-            //                 console.log(err);
-            //                 result.status = 'error';
-            //                 result.reason = 'insert failed';
-            //                 result.fullErrorText = err;
-            //             } else {
-            //                 console.log(sqlRes);
-            //                 result.status = 'ok';
-            //                 result.reason = 'new record inserted';
-            //             }
-            //             getRes.end(JSON.stringify(result));
-            //         });
-            //     });
-            //     break;
-            // }
-            // case '/get/users':
-            // {
-            //     getReq.on('end', function () {
-            //         var sqlScript = 'select * from students ';
-            //         connection.query(sqlScript, {}, function (err, sqlRes) {
-            //             var result = {};
-            //             if (err) {
-            //                 console.log(err);
-            //                 result.status = 'error';
-            //                 result.reason = 'select failed';
-            //                 result.fullErrorText = err;
-            //             } else {
-            //                 console.log(sqlRes);
-            //                 result.status = 'ok';
-            //                 result.reason = 'select done';
-            //                 result.students = sqlRes;
-            //             }
-            //             getRes.end(JSON.stringify(result));
-            //         });
-            //     });
-            //     break;
-            // }
-            // case '/del/user':
-            // {
-            //     getReq.on('end', function () {
-            //         passportID = getReq.query.passportID;
-            //         var sqlScript = 'delete from students where passportID = ?';
-            //         connection.query(sqlScript, passportID, function (err, sqlRes) {
-            //             var result = {};
-            //             if (err) {
-            //                 console.log(err);
-            //                 result.status = 'error';
-            //                 result.reason = 'insert failed';
-            //                 result.fullErrorText = err;
-            //             } else if (sqlRes.affectedRows != 0) {
-            //                 result.status = 'ok';
-            //                 result.reason = 'record deleted';
-            //             } else if (sqlRes.affectedRows == 0) {
-            //                 result.status = 'warning';
-            //                 result.reason = 'record not found';
-            //             }
-            //
-            //             getRes.end(JSON.stringify(result));
-            //         });
-            //     });
-            //     break;
-            // }
-            // case '/auth/user':
-            // {
-            //     console.log(getReq.query);
-            //     var name = getReq.query.name;
-            //     var pass = getReq.query.pass;
-            //     var sqlScript = 'select pass from auth where ?';
-            //     var result = {};
-            //     connection.query(sqlScript, {name: name}, function (sqlErr, sqlRes) {
-            //         console.log(sqlRes);
-            //         if (!sqlRes) {
-            //             ///
-            //             console.log(sqlErr)
-            //         } else if (sqlRes.length !== 0) {
-            //             if (pass === sqlRes[0].pass) {
-            //                 result.status = 'ok';
-            //             }
-            //             else if (pass !== sqlRes[0].pass) {
-            //                 result.status = 'error';
-            //                 result.reason = 'password incorrect';
-            //             }
-            //         }
-            //         else if (sqlRes.length === 0) {
-            //             result.status = 'error';
-            //             result.reason = 'name not found';
-            //         }
-            //         else if (sqlErr) {
-            //             console.log(sqlErr);
-            //             result.status = 'error';
-            //             result.reason = 'query password failed';
-            //             result.fullErrorText = sqlErr;
-            //         }
-            //         console.log(sqlRes);
-            //         console.log(result);
-            //         getRes.end(JSON.stringify(result)); // <<< we need to send role, what say's that result is ok?
-            //     });
-            //     break;
-            // }
-            default:
-            {
-                getRes.sendfile(getReq.path.replace('/', ''));
-            }
+            // default page
+            case '/': {getRes.sendfile("index.html");break;}
+            // all other files needed
+            default: {getRes.sendfile(getReq.path.replace('/', ''));}
         }
     });
 });
 
-//       <<<<<<<<<<<<POST>>>>>>>>>>>>>>>>>>
 
 app.post('/*', function (postReq, postRes) {
     postReq.on("end", function () {
-
-        // console.log("MIDDLE", postRes.bodyStringData);
-        // var postBody = JSON.parse(postData);
         console.log(postReq.path);
         console.log(postRes.bodyData);
         var result = {};
         switch (postReq.path) {
-            case '/auth/user':
-            {
+            case '/auth/user': {
                 var name = postRes.bodyData.name;
                 var pass = postRes.bodyData.pass;
                 var sqlScript = 'select pass from auth where ?';
@@ -229,8 +101,7 @@ app.post('/*', function (postReq, postRes) {
                 });
                 break;
             }
-            case '/role/user':
-            {
+            case '/role/user': {
                 name = postRes.bodyData.name;
                 sqlScript = 'select roleName from roles  ' +
                     'where idRole=(select idRole from users where ?)';
@@ -256,13 +127,12 @@ app.post('/*', function (postReq, postRes) {
                 break;
             }
             case '/schedule/user':
-            case '/schedule/teacher':
-            {
+            case '/schedule/teacher': {
 
                 break;
             }
-            default:
-            {
+            case '/check/'
+            default: {
                 console.log("default");
             }
         }
