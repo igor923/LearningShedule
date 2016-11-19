@@ -31,11 +31,11 @@ var connection = mysql.createConnection({
 
 
 
+ SELECT l.idLEsson , l.startLesson, l.endLesson, u.idUser as idUserStudent, u.name as studentName, u.lastName as studentLastName, u.accessLevel, c.descriptionCourse as course, uu.name as teacherName, uu.lastName as teacherLastName from lessons l INNER JOIN users u on u.idUser in ( select idUserStudent FROM studentsingroups where idGroup in ( select idGroup from courses where idUserTeacher in ( SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' ) and idGroup in ( SELECT idGroup FROM courses WHERE idCourse = l.idCourse ) ) ) INNER JOIN users uu on uu.idUser in ( SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' ) INNER JOIN courses c on c.idCourse in ( SELECT idCourse from courses where idUserTeacher in( SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' ) ) and c.idCourse = l.idCourse WHERE (now() BETWEEN l.startLesson and l.endLesson)
 
 
 
- *
- * */
+ * * */
 
 app.listen(port, function () {
     console.log("Started on PORT " + port);
@@ -232,7 +232,7 @@ app.post('/*', function (postReq, postRes) {
                         sqlScriptToken = "UPDATE `users` SET `currentToken` = '" + result.newToken + "' WHERE ?"
                         connection.query(sqlScriptToken, {login: bodyData.login}, function (sqlErr, sqlRes, sqlFields) {
                             //TODO: WORK WITH ERRORS
-                            console.log('result',result);
+                            console.log('result', result);
                             postRes.end(JSON.stringify(result));
                         });
                     }
@@ -247,8 +247,80 @@ app.post('/*', function (postReq, postRes) {
 
                 break;
             }
-            case '/get/students':{
+            case '/get/students': {
                 console.log(bodyData);
+                // hidden sql script!
+                {
+                    sqlScript = "" +
+                        "SELECT " +
+                        "l.idLEsson , " +
+                        "l.startLesson, " +
+                        "l.endLesson, " +
+                        "u.idUser as idUserStudent, " +
+                        "u.name as studentName, " +
+                        "u.lastName as studentLastName, " +
+                        "u.accessLevel, " +
+                        "c.descriptionCourse as course, " +
+                        "uu.name as teacherName, " +
+                        "uu.lastName as teacherLastName " +
+                        "from lessons l " +
+                        "" +
+                        "INNER JOIN users u on u.idUser in (" +
+                        "   select idUserStudent FROM studentsingroups where idGroup in ( " +
+                        "       select idGroup from courses where idUserTeacher in ( " +
+                        "           SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' " +
+                        "       ) and " +
+                        "   idGroup in ( " +
+                        "       SELECT idGroup FROM courses WHERE idCourse = l.idCourse " +
+                        "   ) " +
+                        ") " +
+                        ") " +
+                        "" +
+                        "INNER JOIN users uu on uu.idUser in ( " +
+                        "   SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' " +
+                        ") " +
+                        "" +
+                        "INNER JOIN courses c on c.idCourse in ( " +
+                        "   SELECT idCourse from courses where idUserTeacher in( " +
+                        "       SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' ) ) " +
+                        "" +
+                        "and c.idCourse = l.idCourse WHERE (now() BETWEEN l.startLesson and l.endLesson)"
+                }
+                sqlBody = {currentToken: bodyData.currentToken};
+                connection.query(sqlScript, sqlBody, function (sqlErr, sqlRes, sqlFields) {
+                    console.log('/STUDENTS/');
+                    console.log(sqlRes);
+                    console.log('/STUDENTS/');
+                    postRes.send(JSON.stringify(sqlRes))
+                });
+
+                break;
+            }
+            case '/set/attendance': {
+                // console.log(bodyData);
+                // TODO: CHECK privilegies by !TOKEN!
+                sqlScript = "INSERT INTO `attendance` set ?"
+                sqlBody = {
+                    idLesson: bodyData.idLesson,
+                    idUserStudent: bodyData.idUserStudent,
+                    presence:bodyData.presence
+                };
+                connection.query(sqlScript, sqlBody, function (sqlErr, sqlRes, sqlFields) {
+                    if (sqlErr) {
+                        console.log('/ERROR/');
+                        console.log(sqlErr);
+                        console.log('/ERROR/');
+                        result.status = 'error';
+                        result.reason = 'sql error';
+                        result.fullErrorText = sqlErr;
+                    }else {
+                        result.status='ok';
+                        result.reason='record added';
+                        result.fullResultText=sqlErr;
+                    }
+                    // postRes.send(JSON.stringify(sqlRes));
+                    postRes.send(JSON.stringify(result));
+                });
                 break;
             }
             default: {
