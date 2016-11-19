@@ -1,57 +1,17 @@
 var express = require("express");
-var bodyParser = require("body-parser");
+// var bodyParser = require("body-parser");
 var http = require("http");
 var url = require('url');
 var mysql = require('mysql');
 var app = express();
 var port = 3000;
 var headers = require('./headers');
-var dataBaseName = 'events';
+var dataBaseName = 'learningscheduler';
 var randtoken = require('rand-token');
 var uid = require('rand-token').uid;
+var sqlCreators = require('./sqlCreators');
 
-
-/*
- app.use(bodyParser.urlencoded({extended: false}));
- app.use(bodyParser.json());
- */
-
-app.use("/*", function (req, res, next) {
-
-    var bodyStringData = '';
-    req.on("data", function (chunk) {
-
-        bodyStringData = bodyStringData + chunk;
-    });
-    req.on("end", function () {
-        console.log(bodyStringData);
-        res.bodyStringData = bodyStringData;
-        if (res.bodyStringData) {
-            res.bodyData = JSON.parse(res.bodyStringData);
-        }
-    });
-    headers.setHeaders(res);
-    next();
-});
-{
-    var tableStudentScript = "" +
-        "CREATE TABLE IF NOT EXISTS `" +
-        'students' +
-        "` (    " +
-        "`idStudent` int UNSIGNED AUTO_INCREMENT,    " +
-        "`firstName` varchar(35) DEFAULT NULL,    " +
-        "`lastName` varchar(50) DEFAULT NULL,    " +
-        "`phone` varchar(20) DEFAULT NULL,    " +
-        "`e-mail` varchar(255) DEFAULT NULL,    " +
-        "`address` varchar(255) DEFAULT NULL,    " +
-        "`passportID` int(11) DEFAULT NULL," +
-        "PRIMARY KEY (`idStudent`)," +
-        "UNIQUE `passportID`(`passportID`)" +
-        ")";
-}
-{
-    var tableAuthScript = "CREATE TABLE IF NOT EXISTS `events`.`auth` ( `idAuth` INT NOT NULL AUTO_INCREMENT , `name` VARCHAR(25) NOT NULL , `pass` VARCHAR(45) NOT NULL , PRIMARY KEY (`idAuth`)) ENGINE = MyISAM;";
-}
+console.log(sqlCreators.sqlCreators());
 
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -60,12 +20,23 @@ var connection = mysql.createConnection({
     port: 3306,
     database: dataBaseName
 });
-connection.query(tableAuthScript, function (err, res, fields) {
-    console.log(err);
-});
-connection.query(tableStudentScript, function (err, res, fields) {
-    console.log(err);
-});
+
+// connection.query(tableAuthScript, function (err, res, fields) {console.log(err);});
+// connection.query(tableStudentScript, function (err, res, fields) {console.log(err);});
+/*
+ *
+
+ SELECT l.timeLesson, cl.numerClassRoom, cr.descriptionCourse, u.name FROM lessons l INNER JOIN classrooms cl on l.idClassRoom = cl.idClassRoom INNER JOIN courses cr on l.idCourse = cr.idCourse INNER JOIN users u on u.idUser = (SELECT idUserTeacher from courses where idCourse = l.idCourse) and l.idCourse in (SELECT idCourse from courses WHERE idGroup in (SELECT idGroup from studentsingroups WHERE idUserStudent = (SELECT idUser from users WHERE currentToken = 'q100500q')))
+
+
+
+
+
+
+
+ *
+ * */
+
 app.listen(port, function () {
     console.log("Started on PORT " + port);
 });
@@ -76,148 +47,34 @@ app.get('/*', function (getReq, getRes) {
     });
     getReq.on('end', function (getData) {
         switch (getReq.path) {
-            case '/':
-            {
-                // console.log("Hello" + getReq.path);
+            // default page
+            case '/': {
                 getRes.sendfile("index.html");
-                break
-            }
-            case '/add/user':
-            {
-                console.log(getReq.query);
-                getReq.on('end', function () {
-                    var firstName = getReq.query.firstName;
-                    var lastName = getReq.query.lastName;
-                    var passportID = getReq.query.passportID;
-                    var sqlScript = 'insert into students set ?';
-                    var studentSet = {
-                        idStudent: null,
-                        firstName: firstName,
-                        lastName: lastName,
-                        passportID: passportID
-                    };
-                    connection.query(sqlScript, studentSet, function (err, sqlRes) {
-                        var result = {};
-                        if (err) {
-                            console.log(err);
-                            result.status = 'error';
-                            result.reason = 'insert failed';
-                            result.fullErrorText = err;
-                        } else {
-                            console.log(sqlRes);
-                            result.status = 'ok';
-                            result.reason = 'new record inserted';
-                        }
-                        getRes.end(JSON.stringify(result));
-                    });
-                });
                 break;
             }
-            case '/get/users':
-            {
-                getReq.on('end', function () {
-                    var sqlScript = 'select * from students ';
-                    connection.query(sqlScript, {}, function (err, sqlRes) {
-                        var result = {};
-                        if (err) {
-                            console.log(err);
-                            result.status = 'error';
-                            result.reason = 'select failed';
-                            result.fullErrorText = err;
-                        } else {
-                            console.log(sqlRes);
-                            result.status = 'ok';
-                            result.reason = 'select done';
-                            result.students = sqlRes;
-                        }
-                        getRes.end(JSON.stringify(result));
-                    });
-                });
-                break;
-            }
-            case '/del/user':
-            {
-                getReq.on('end', function () {
-                    passportID = getReq.query.passportID;
-                    var sqlScript = 'delete from students where passportID = ?';
-                    connection.query(sqlScript, passportID, function (err, sqlRes) {
-                        var result = {};
-                        if (err) {
-                            console.log(err);
-                            result.status = 'error';
-                            result.reason = 'insert failed';
-                            result.fullErrorText = err;
-                        } else if (sqlRes.affectedRows != 0) {
-                            result.status = 'ok';
-                            result.reason = 'record deleted';
-                        } else if (sqlRes.affectedRows == 0) {
-                            result.status = 'warning';
-                            result.reason = 'record not found';
-                        }
-
-                        getRes.end(JSON.stringify(result));
-                    });
-                });
-                break;
-            }
-            case '/auth/user':
-            {
-                console.log(getReq.query);
-                var name = getReq.query.name;
-                var pass = getReq.query.pass;
-                var sqlScript = 'select pass from auth where ?';
-                var result = {};
-                connection.query(sqlScript, {name: name}, function (sqlErr, sqlRes) {
-                    console.log(sqlRes);
-                    if (!sqlRes) {
-                        ///
-                        console.log(sqlErr)
-                    } else if (sqlRes.length !== 0) {
-                        if (pass === sqlRes[0].pass) {
-                            result.status = 'ok';
-                        }
-                        else if (pass !== sqlRes[0].pass) {
-                            result.status = 'error';
-                            result.reason = 'password incorrect';
-                        }
-                    }
-                    else if (sqlRes.length === 0) {
-                        result.status = 'error';
-                        result.reason = 'name not found';
-                    }
-                    else if (sqlErr) {
-                        console.log(sqlErr);
-                        result.status = 'error';
-                        result.reason = 'query password failed';
-                        result.fullErrorText = sqlErr;
-                    }
-                    console.log(sqlRes);
-                    console.log(result);
-                    getRes.end(JSON.stringify(result)); // <<< we need to send role, what say's that result is ok?
-                });
-                break;
-            }
-            default:
-            {
+            // all other files needed
+            default: {
                 getRes.sendfile(getReq.path.replace('/', ''));
             }
         }
     });
 });
 
-//       <<<<<<<<<<<<POST>>>>>>>>>>>>>>>>>>
 
 app.post('/*', function (postReq, postRes) {
-    postReq.on("end", function () {
+    var bodyStringData = '';
+    var bodyData = {};
+    postReq.on("data", function (chunk) {
+        bodyStringData = bodyStringData + chunk;
+    });
 
-        // console.log("MIDDLE", postRes.bodyStringData);
-        // var postBody = JSON.parse(postData);
-        console.log(postReq.path);
-        console.log(postRes.bodyData);
+    postReq.on("end", function () {
+        bodyData = JSON.parse(bodyStringData);
+        console.log("bodyStringData ", bodyStringData);
+        console.log("bodyData ", bodyData);
         var result = {};
         switch (postReq.path) {
-            case '/auth/user':
-            {
+            case '/auth/user': {
                 var name = postRes.bodyData.name;
                 var pass = postRes.bodyData.pass;
                 var sqlScript = 'select pass from auth where ?';
@@ -254,8 +111,7 @@ app.post('/*', function (postReq, postRes) {
                 });
                 break;
             }
-            case '/role/user':
-            {
+            case '/role/user': {
                 name = postRes.bodyData.name;
                 sqlScript = 'select roleName from roles  ' +
                     'where idRole=(select idRole from users where ?)';
@@ -281,71 +137,119 @@ app.post('/*', function (postReq, postRes) {
                 break;
             }
             case '/schedule/user':
-            case '/schedule/teacher':
-            {
+            case '/schedule/teacher': {
 
                 break;
             }
-            default:
-            {
+            case '/check/token': {
+                result = {};
+                sqlScript = 'select * from users where ?';
+                login = bodyData.login;
+                token = bodyData.token;
+                connection.query(sqlScript, {currentToken: token}, function (sqlErr, sqlRes, sqlFields) {
+                        // console.log('error: ', sqlErr);
+                        if (sqlErr) {
+                            result.status = 'error';
+                            result.reason = 'sql reqest failed';
+                            result.fullErrorText = sqlErr;
+                        }
+                        else if (sqlRes.length == 0) {
+                            result.status = 'error';
+                            result.reason = 'token not found';
+                        }
+                        else if (sqlRes[0].currentToken.valueOf() == token.valueOf()) {
+                            result.status = 'ok';
+                            result.reason = 'token passed';
+                            result.accessLevel = sqlRes[0].accessLevel;
+                            result.login = sqlRes[0].login;
+
+                        }
+                        console.log(token);
+                        console.log(login);
+                        console.log(sqlRes);
+                        postRes.end(JSON.stringify(result));
+                    }
+                )
+                break;
+            }
+            case '/create/user': {
+                result = {};
+                sqlScript = 'insert into users set ?';
+                connection.query(sqlScript, bodyData, function (sqlErr, sqlRes, sqlFields) {
+                    console.log(sqlErr);
+                    console.log(sqlRes);
+                    result = sqlRes;
+                    postRes.end(JSON.stringify(result));
+                });
+
+                break;
+            }
+            case '/get/scheduler': {
+                console.log(bodyData);
+                sqlScript = "" +
+                    "SELECT " +
+                    "l.timeLesson as time," +
+                    "l.dateLesson as date, " +
+                    "cl.numerClassRoom as auditory, " +
+                    "cl.cityClassRoom as city, " +
+                    "cr.descriptionCourse as course,  " +
+                    "u.name as teacherName, " +
+                    "u.lastName as teacherLastName " +
+                    "FROM lessons l INNER JOIN classrooms cl on l.idClassRoom = cl.idClassRoom INNER JOIN courses cr on l.idCourse = cr.idCourse INNER JOIN users u on u.idUser = (SELECT idUserTeacher from courses where idCourse = l.idCourse) and l.idCourse in (SELECT idCourse from courses WHERE idGroup in (SELECT idGroup from studentsingroups WHERE idUserStudent = (SELECT idUser from users WHERE ?)))";
+                connection.query(sqlScript, {currentToken: bodyData.currentToken}, function (sqlErr, sqlRes, sqlFields) {
+                    console.log(sqlErr);
+                    console.log(sqlRes);
+                    result = sqlRes;
+                    postRes.end(JSON.stringify(result));
+                });
+                break;
+            }
+            case '/set/token': {
+                // console.log(bodyData);
+                //check login - password
+                sqlScript = "select login,pass,accessLevel from users where ?"
+                sqlBody = {login: bodyData.login}
+                console.log(sqlBody);
+                connection.query(sqlScript, sqlBody, function (sqlErr, sqlRes, sqlFields) {
+                    console.log('sqlRes length:', sqlRes.length, "");
+                    console.log('sqlRes :', sqlRes, "");
+                    if (sqlErr) {
+                        result.status = 'error';
+                        result.reason = 'sql error';
+                        result.fullErrorText = sqlErr;
+                        postRes.end(JSON.stringify(result));
+                    }
+                    else if (sqlRes.length == 0) {
+                        result.status = 'error';
+                        result.reason = 'login not found';
+                        postRes.end(JSON.stringify(result));
+                    }
+                    else if (bodyData.pass.valueOf() == sqlRes[0].pass.valueOf()) {
+                        result.status = 'ok';
+                        result.newToken = uid(32);
+                        result.accessLevel = sqlRes[0].accessLevel;
+                        console.log('newToken: ', result.newToken, " ");
+                        sqlScriptToken = "UPDATE `users` SET `currentToken` = '" + result.newToken + "' WHERE ?"
+                        connection.query(sqlScriptToken, {login: bodyData.login}, function (sqlErr, sqlRes, sqlFields) {
+                            //TODO: WORK WITH ERRORS
+                            console.log('result',result);
+                            postRes.end(JSON.stringify(result));
+                        });
+                    }
+
+
+                });
+
+
+                // TODO: return status:ok / error
+                // TODO: return new token
+                // TODO: insert new token into db
+
+                break;
+            }
+            default: {
                 console.log("default");
             }
         }
     });
 });
-
-///////////////////////////
-/*
- var week = {
- days: [
- {
- date: date,
- dayOfWeek: dayOfWeek,
- lessons: [
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- },
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- },
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- }
- ]
- },
- {
- date: date,
- dayOfWeek: dayOfWeek,
- lessons: [
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- },
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- },
- {
- time: time,
- class: className,
- teacher: teacher,
- subject: subject
- }
- ]
- }
- ]
- };
- */
