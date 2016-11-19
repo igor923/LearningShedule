@@ -9,10 +9,6 @@ var headers = require('./headers');
 var dataBaseName = 'learningscheduler';
 var randtoken = require('rand-token');
 var uid = require('rand-token').uid;
-// var sqlCreators = require('./sqlCreators');
-
-// console.log(sqlCreators.sqlCreators());
-
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -148,6 +144,7 @@ app.post('/*', function (postReq, postRes) {
                             result.status = 'error';
                             result.reason = 'sql reqest failed';
                             result.fullErrorText = sqlErr;
+                            console.log(sqlErr);
                         }
                         else if (sqlRes.length == 0) {
                             result.status = 'error';
@@ -230,7 +227,7 @@ app.post('/*', function (postReq, postRes) {
                         result.newToken = uid(32);
                         result.accessLevel = sqlRes[0].accessLevel;
                         console.log('newToken: ', result.newToken, " ");
-                        sqlScriptToken = "UPDATE `users` SET `currentToken` = '" + result.newToken + "' WHERE ?"
+                        sqlScriptToken = "UPDATE `users` SET `currentToken` = '" + result.newToken + "' WHERE ?";
                         connection.query(sqlScriptToken, {login: bodyData.login}, function (sqlErr, sqlRes, sqlFields) {
                             //TODO: WORK WITH ERRORS
                             console.log('result', result);

@@ -10,57 +10,86 @@
 
     <script src="imports/core.js"></script>
     <script src="imports/md5.js"></script>
-    <style type="text/css">
-        * {
-            transition: 1s;
-        }
-        .red {
-            border-color: #ff0000;
-        }
-    </style>
-
+    <script src="teacherPage.js"></script>
+    <script src="student.js"></script>
+    <link rel="stylesheet" href="styleAuth.css"/>
 </head>
 <body>
+<div id="container">
+    <div id="header">
 
+        <img id="logoBig" class="centered" src="img/Logobig.png"/>
+        <img id="logo" class="centered" src="img/Logo.png"/>
 
-<div class="wrapper">
-    <div id="token">dfdfd</div>
-    <input type="text" id="user">
-    <input type="text" id="pass">
-    <button id="submit">OK</button>
-    <button id="clear">Clear</button>
-    <button id="getRoleBtn">get role</button>
+        <div class=" centered telran">
+            <h1>TEL-RAN</h1>
+            <h6>COMPUTING SOLUTION LTD.</h6>
+            <h3>ATTENDANCE AND SHEDULE</h3></div>
+    </div>
+
+    <div id="content" class="centered">
+           <!--<form  action="" novalidate >-->
+            <input id="user" class="input" type="text" name="login" placeholder="login"><br>
+            <input id="pass" class="input" type="password" name="password" placeholder="password"><br>
+            <input id="submit" class="but" type="submit" name="submit" value="SUBMIT">
+       <!-- </form>-->
+        <h6>Just input your login and password<br>
+            and you’ll be transferred to personal page</h6>
+    </div>
 </div>
+
+<script src="admin.js"></script>
 <script>
     //    console.log("prev coookie ",);
-    $("#token").text($.cookie("token"));
-    $('#submit').click(function () {
-        var passMD5 = CryptoJS.MD5($('#pass').val()).toString();
-        var user = $('#user').val();
-        var url = '/auth/user';
-        var postBody = {
-            pass: passMD5,
-            name: user
-        };
-        var strPostBody = JSON.stringify(postBody);
-        requestToServerPost(url, strPostBody);
-    });
 
-    var requestToServerPost = function (url, postBody) {
-        $.post(url, postBody, function (data) {
-            $('input').removeClass('red');
-            console.log('data:' + data);    //>>> here response from server - 'data'
-            var result = JSON.parse(data);
-            if (result.status != 'ok') {
-                console.log($(result.field));
-                $(result.field).addClass("red");
-            }
-            if (result.token) {
-                $.cookie("token", result.token);
+    $(function () {
+           if ($.cookie("token")){
+                    var requestBody = {
+                      token: $.cookie("token") ,
+                      login: ''
+                    };
+               $.post('/check/token',JSON.stringify(requestBody), function (data) {
+                   var response = JSON.parse(data);
+                   if(response.status === 'ok'){
+                       routing(response.accessLevel, $.cookie("token"));
+                   }
+               } );
+           }
 
-            }
+        $('#submit').click(function () {
+
+            var passMD5 = CryptoJS.MD5($('#pass').val()).toString();
+            var url = '/set/token';
+            var postBody = {
+                login: $('#user').val(),
+                pass:passMD5
+            };
+            var strPostBody = JSON.stringify(postBody);
+            requestToServerPost(url, strPostBody);
         });
-    };
+
+        var requestToServerPost = function (url, postBody) {
+
+            $.post(url, postBody, function (data) {
+                $('input').removeClass('red');
+                var result = JSON.parse(data);
+                if (result.status != 'ok') {
+                    console.log($(result.field));
+                    $(result.field).addClass("red");
+                }
+                if (result.newToken) {
+                    $.cookie("token", result.newToken);
+                     routing(result.accessLevel, result.newToken);
+                }
+            });
+        };
+        var routing = function (role, token) {
+                if(role === 'student') Student.studentPage(token);       // Igor
+            else if(role === 'teacher') teacherPage(token) ;// Kirill
+            else if(role === 'admin') adminPage(token);      // none
+        }
+
+    });
 </script>
 
 </body>

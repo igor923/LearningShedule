@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="225px" height="225px" viewBox="0 0 225 225" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 40.3 (33839) - http://www.bohemiancoding.com/sketch -->
+    <title>Logo</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="-13.7978393%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#3498DB" offset="100%"></stop>
+        </linearGradient>
+        <rect id="path-2" x="0" y="0" width="1024" height="400"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop" transform="translate(-400.000000, -20.000000)">
+            <g id="Logo">
+                <mask id="mask-3" fill="white">
+                    <use xlink:href="#path-2"></use>
+                </mask>
+                <use id="Mask" fill="url(#linearGradient-1)" xlink:href="#path-2"></use>
+                <g opacity="0.1" mask="url(#mask-3)">
+                    <g transform="translate(183.000000, -195.000000)">
+                        <g>
+                            <path d="M111,2 L116,2 L80,38 L80,33 L116,69 L111,69 L147,33 L147,38 L111,2 Z M149,36 L114,71 L78,36 L114,0 L149,36 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                            <path d="M150,41 L154,41 L119,76 L119,72 L154,107 L150,107 L185,72 L185,76 L150,41 Z M187,74 L152,109 L117,74 L152,39 L187,74 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                            <path d="M150,118 L154,118 L119,153 L119,149 L154,184 L150,184 L185,149 L185,153 L150,118 Z M187,151 L152,186 L117,151 L152,116 L187,151 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                            <path d="M111,157 L115,157 L80,192 L80,188 L115,223 L111,223 L146,188 L146,192 L111,157 Z M148,190 L113,225 L78,190 L113,155 L148,190 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                            <path d="M188,80 L192,80 L157,115 L157,111 L192,146 L188,146 L223,111 L223,115 L188,80 Z M225,113 L190,148 L155,113 L190,78 L225,113 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                            <polygon id="Rectangle-2" fill="#FFFFFF" points="74.1494949 39 109.504834 74.3553391 74.1494949 109.710678 38.7941559 74.3553391"></polygon>
+                            <polygon id="Rectangle-2" fill="#FFFFFF" points="74.1494949 116 109.504834 151.355339 74.1494949 186.710678 38.7941559 151.355339"></polygon>
+                            <polygon id="Rectangle-2" fill="#FFFFFF" points="35.3553391 78 70.7106781 113.355339 35.3553391 148.710678 0 113.355339"></polygon>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g id="Logo" transform="translate(400.000000, 20.000000)" fill="#FFFFFF">
+                <g id="Rectangle-2">
+                    <path d="M111,2 L116,2 L80,38 L80,33 L116,69 L111,69 L147,33 L147,38 L111,2 Z M149,36 L114,71 L78,36 L114,0 L149,36 Z"></path>
+                    <path d="M150,41 L154,41 L119,76 L119,72 L154,107 L150,107 L185,72 L185,76 L150,41 Z M187,74 L152,109 L117,74 L152,39 L187,74 Z"></path>
+                    <path d="M150,118 L154,118 L119,153 L119,149 L154,184 L150,184 L185,149 L185,153 L150,118 Z M187,151 L152,186 L117,151 L152,116 L187,151 Z"></path>
+                    <path d="M111,157 L115,157 L80,192 L80,188 L115,223 L111,223 L146,188 L146,192 L111,157 Z M148,190 L113,225 L78,190 L113,155 L148,190 Z"></path>
+                    <path d="M188,80 L192,80 L157,115 L157,111 L192,146 L188,146 L223,111 L223,115 L188,80 Z M225,113 L190,148 L155,113 L190,78 L225,113 Z"></path>
+                    <polygon points="74.1494949 39 109.504834 74.3553391 74.1494949 109.710678 38.7941559 74.3553391"></polygon>
+                    <polygon points="74.1494949 116 109.504834 151.355339 74.1494949 186.710678 38.7941559 151.355339"></polygon>
+                    <polygon points="35.3553391 78 70.7106781 113.355339 35.3553391 148.710678 0 113.355339"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
