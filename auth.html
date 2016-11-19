@@ -10,6 +10,7 @@
 
     <script src="imports/core.js"></script>
     <script src="imports/md5.js"></script>
+    <script src="student.js"></script>
     <link rel="stylesheet" href="styleAuth.css"/>
 </head>
 <body>
@@ -82,7 +83,7 @@
             });
         };
         var routing = function (role, token) {
-            if(role === 'student') studentPage(token);       // Igor
+                if(role === 'student') Student.studentPage(token);       // Igor
             else if(role === 'teacher') teacherPage(token) ;// Kirill
             else if(role === 'admin') adminPage(token);      // none
         }
