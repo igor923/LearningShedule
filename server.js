@@ -266,7 +266,9 @@ app.post('/*', function (postReq, postRes) {
                         "INNER JOIN users u on u.idUser in (" +
                         "   select idUserStudent FROM studentsingroups where idGroup in ( " +
                         "       select idGroup from courses where idUserTeacher in ( " +
-                        "           SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' " +
+                        "           SELECT idUser from users where currentToken='" +
+                        bodyData.currentToken +
+                        "' " +
                         "       ) and " +
                         "   idGroup in ( " +
                         "       SELECT idGroup FROM courses WHERE idCourse = l.idCourse " +
@@ -275,12 +277,16 @@ app.post('/*', function (postReq, postRes) {
                         ") " +
                         "" +
                         "INNER JOIN users uu on uu.idUser in ( " +
-                        "   SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' " +
+                        "   SELECT idUser from users where currentToken='" +
+                        bodyData.currentToken +
+                        "' " +
                         ") " +
                         "" +
                         "INNER JOIN courses c on c.idCourse in ( " +
                         "   SELECT idCourse from courses where idUserTeacher in( " +
-                        "       SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' ) ) " +
+                        "       SELECT idUser from users where currentToken='" +
+                        bodyData.currentToken +
+                        "' ) ) " +
                         "" +
                         "and c.idCourse = l.idCourse WHERE (now() BETWEEN l.startLesson and l.endLesson)"
                 }
