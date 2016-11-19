@@ -27,6 +27,10 @@ var connection = mysql.createConnection({
  *
 
  SELECT l.timeLesson, cl.numerClassRoom, cr.descriptionCourse, u.name FROM lessons l INNER JOIN classrooms cl on l.idClassRoom = cl.idClassRoom INNER JOIN courses cr on l.idCourse = cr.idCourse INNER JOIN users u on u.idUser = (SELECT idUserTeacher from courses where idCourse = l.idCourse) and l.idCourse in (SELECT idCourse from courses WHERE idGroup in (SELECT idGroup from studentsingroups WHERE idUserStudent = (SELECT idUser from users WHERE currentToken = 'q100500q')))
+
+
+
+
  SELECT l.idLEsson , l.startLesson, l.endLesson, u.idUser as idUserStudent, u.name as studentName, u.lastName as studentLastName, u.accessLevel, c.descriptionCourse as course, uu.name as teacherName, uu.lastName as teacherLastName from lessons l INNER JOIN users u on u.idUser in ( select idUserStudent FROM studentsingroups where idGroup in ( select idGroup from courses where idUserTeacher in ( SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' ) and idGroup in ( SELECT idGroup FROM courses WHERE idCourse = l.idCourse ) ) ) INNER JOIN users uu on uu.idUser in ( SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' ) INNER JOIN courses c on c.idCourse in ( SELECT idCourse from courses where idUserTeacher in( SELECT idUser from users where currentToken='UOQBHZAlkqTbWIz4YSdqbDcfI4p3nDGf' ) ) and c.idCourse = l.idCourse WHERE (now() BETWEEN l.startLesson and l.endLesson)
 
 
@@ -184,19 +188,14 @@ app.post('/*', function (postReq, postRes) {
                 console.log(bodyData);
                 sqlScript = "" +
                     "SELECT " +
-                    "l.startLesson as time," +
+                    "l.timeLesson as time," +
+                    "l.dateLesson as date, " +
                     "cl.numerClassRoom as auditory, " +
                     "cl.cityClassRoom as city, " +
                     "cr.descriptionCourse as course,  " +
                     "u.name as teacherName, " +
                     "u.lastName as teacherLastName " +
-                    "FROM lessons l INNER JOIN classrooms cl on l.idClassRoom = cl.idClassRoom " +
-                    "INNER JOIN courses cr on l.idCourse = cr.idCourse " +
-                    "INNER JOIN users u on u.idUser = (SELECT idUserTeacher from courses where idCourse = l.idCourse) " +
-                    "and l.idCourse in " +
-                    "(SELECT idCourse from courses WHERE idGroup in " +
-                    "(SELECT idGroup from studentsingroups WHERE idUserStudent = " +
-                    "(SELECT idUser from users WHERE ?)))";
+                    "FROM lessons l INNER JOIN classrooms cl on l.idClassRoom = cl.idClassRoom INNER JOIN courses cr on l.idCourse = cr.idCourse INNER JOIN users u on u.idUser = (SELECT idUserTeacher from courses where idCourse = l.idCourse) and l.idCourse in (SELECT idCourse from courses WHERE idGroup in (SELECT idGroup from studentsingroups WHERE idUserStudent = (SELECT idUser from users WHERE ?)))";
                 connection.query(sqlScript, {currentToken: bodyData.currentToken}, function (sqlErr, sqlRes, sqlFields) {
                     console.log(sqlErr);
                     console.log(sqlRes);
