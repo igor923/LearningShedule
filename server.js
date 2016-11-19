@@ -9,14 +9,14 @@ var headers = require('./headers');
 var dataBaseName = 'learningscheduler';
 var randtoken = require('rand-token');
 var uid = require('rand-token').uid;
-var sqlCreators = require('./sqlCreators');
+// var sqlCreators = require('./sqlCreators');
 
-console.log(sqlCreators.sqlCreators());
+/*console.log(sqlCreators.sqlCreators());*/
 
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '1234',
+    password: '',
     port: 3306,
     database: dataBaseName
 });
