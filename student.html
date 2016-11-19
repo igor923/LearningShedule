@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="jsonBackEnd.js"></script>
-    <script src = "../jquery.min.js"></script>
+    <script src="imports/jquery-3.1.1.min.js"></script>
     <style>
         .button{
             position: fixed;
@@ -78,9 +77,9 @@
 </table>
 
 <script>
-    var token="111";
-    var url = "http://127.0.0.1:8081";
-    buttonOnclick("schedule","/schedule","tbl");
+    var token="a83r9uYsXGQPmmz9w6FWGa6MYmcMJcqY";
+    /*var url = "/get/schedule";*/
+    buttonOnclick("schedule","/get/scheduler","tbl");
     buttonOnclick("attendance","/attendance");
     buttonOnclick("payments","/payments");
 
@@ -91,7 +90,7 @@
 
         $("#"+id).click(function () {
          var obj={
-             token:token
+             currentToken:token
          };
             sendRequest(path,obj,divId);
 
@@ -113,7 +112,7 @@
 
                 }
             }
-            else if (path == "/schedule") {
+            else if (path == "/get/scheduler") {
                 if (xhr.response == "error") {
                     console.log("ERROR SCHEDULE")}
                     /*it will be JSON*/
@@ -150,7 +149,7 @@
 
         };
 
-        xhr.open("POST",url+path,true);
+        xhr.open("POST",path,true);
         xhr.send(JSON.stringify(obj));
 
     }
@@ -161,11 +160,11 @@
     }
 
     function tableSchedule(days,divId) {
-
+        console.log(days);
         var scheduleTable = {
 
-            sunTime0 : days.days[0].lessons[0].time,
-            sunSubj0 :  days.days[0].lessons[0].subject,
+            sunTime0 : days[0].time,
+          /*  sunSubj0 :  days.days[0].lessons[0].subject,
             sunTeacher0 : days.days[0].lessons[0].teacher,
             sunClassRoom0 : days.days[0].lessons[0].classRoom,
 
@@ -182,19 +181,19 @@
             monTime1 : days.days[1].lessons[1].time,
             monSubj1 : days.days[1].lessons[1].subject,
             monTeacher1 : days.days[1].lessons[1].teacher,
-            monClassRoom1 : days.days[1].lessons[1].classRoom
+            monClassRoom1 : days.days[1].lessons[1].classRoom*/
 
         };
 
         var tbl=document.getElementById(divId);
         tbl.rows[0].cells[0].innerText=scheduleTable.sunTime0;
-        tbl.rows[0].cells[1].innerHTML=scheduleTable.sunSubj0+"<br>"+scheduleTable.sunTeacher0+"<br>"+scheduleTable.sunClassRoom0;
+       /* tbl.rows[0].cells[1].innerHTML=scheduleTable.sunSubj0+"<br>"+scheduleTable.sunTeacher0+"<br>"+scheduleTable.sunClassRoom0;
         tbl.rows[1].cells[0].innerText=scheduleTable.sunTime1;
         tbl.rows[1].cells[1].innerHTML=scheduleTable.sunSubj1+"<br>"+scheduleTable.sunTeacher1+"<br>"+scheduleTable.sunClassRoom1;
         tbl.rows[0].cells[2].innerText=scheduleTable.monTime0;
         tbl.rows[0].cells[3].innerHTML=scheduleTable.monSubj0+"<br>"+scheduleTable.monTeacher0+"<br>"+scheduleTable.monClassRoom0;
         tbl.rows[1].cells[2].innerText=scheduleTable.monTime1;
-        tbl.rows[1].cells[3].innerHTML=scheduleTable.monSubj1+"<br>"+scheduleTable.monTeacher1+"<br>"+scheduleTable.monClassRoom1;
+        tbl.rows[1].cells[3].innerHTML=scheduleTable.monSubj1+"<br>"+scheduleTable.monTeacher1+"<br>"+scheduleTable.monClassRoom1;*/
 
     }
     function fillAttendance() {
