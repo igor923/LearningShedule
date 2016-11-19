@@ -153,14 +153,14 @@ app.post('/*', function (postReq, postRes) {
                             result.reason = 'sql reqest failed';
                             result.fullErrorText = sqlErr;
                         }
-                        else if (sqlRes.length==0){
+                        else if (sqlRes.length == 0) {
                             result.status = 'error';
                             result.reason = 'token not found';
                         }
                         else if (sqlRes[0].currentToken.valueOf() == token.valueOf()) {
                             result.status = 'ok';
                             result.reason = 'token passed';
-                            result.accessLevel =sqlRes[0].accessLevel;
+                            result.accessLevel = sqlRes[0].accessLevel;
                             result.login = sqlRes[0].login;
 
                         }
@@ -207,10 +207,12 @@ app.post('/*', function (postReq, postRes) {
             case '/set/token': {
                 // console.log(bodyData);
                 //check login - password
-                sqlScript = "select login,pass, from users where ?"
+                sqlScript = "select login,pass,accessLevel from users where ?"
                 sqlBody = {login: bodyData.login}
+                console.log(sqlBody);
                 connection.query(sqlScript, sqlBody, function (sqlErr, sqlRes, sqlFields) {
-                     console.log('sqlRes length:',sqlRes.length,"");
+                    console.log('sqlRes length:', sqlRes.length, "");
+                    console.log('sqlRes :', sqlRes, "");
                     if (sqlErr) {
                         result.status = 'error';
                         result.reason = 'sql error';
@@ -225,10 +227,12 @@ app.post('/*', function (postReq, postRes) {
                     else if (bodyData.pass.valueOf() == sqlRes[0].pass.valueOf()) {
                         result.status = 'ok';
                         result.newToken = uid(32);
-                        console.log('newToken: ',result.newToken," ");
+                        result.accessLevel = sqlRes[0].accessLevel;
+                        console.log('newToken: ', result.newToken, " ");
                         sqlScriptToken = "UPDATE `users` SET `currentToken` = '" + result.newToken + "' WHERE ?"
                         connection.query(sqlScriptToken, {login: bodyData.login}, function (sqlErr, sqlRes, sqlFields) {
                             //TODO: WORK WITH ERRORS
+                            console.log('result',result);
                             postRes.end(JSON.stringify(result));
                         });
                     }
