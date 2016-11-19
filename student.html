@@ -163,17 +163,22 @@
         console.log(days);
         var scheduleTable = {
 
+            sunDate0 : days[0].date,
             sunTime0 : days[0].time,
-          /*  sunSubj0 :  days.days[0].lessons[0].subject,
-            sunTeacher0 : days.days[0].lessons[0].teacher,
-            sunClassRoom0 : days.days[0].lessons[0].classRoom,
+            sunCourse0 :  days[0].course,
+            sunTeacherLName0 : days[0].teacherLastName,
+            sunTeacherName0 : days[0].teacherName,
+            sunAuditory0 : days[0].auditory,
 
-            sunTime1 : days.days[0].lessons[1].time,
-            sunSubj1 : days.days[0].lessons[1].subject,
-            sunTeacher1 : days.days[0].lessons[1].teacher,
-            sunClassRoom1 : days.days[0].lessons[1].classRoom,
 
-            monTime0 : days.days[1].lessons[0].time,
+            sunDate1 : days[1].date,
+            sunTime1 : days[1].time,
+            sunCourse1 :  days[1].course,
+            sunTeacherLName1 : days[1].teacherLastName,
+            sunTeacherName1 : days[1].teacherName,
+            sunAuditory1 : days[1].auditory
+
+           /* monTime0 : days.days[1].lessons[0].time,
             monSubj0 : days.days[1].lessons[0].subject,
             monTeacher0 : days.days[1].lessons[0].teacher,
             monClassRoom0 : days.days[1].lessons[0].classRoom,
@@ -186,11 +191,11 @@
         };
 
         var tbl=document.getElementById(divId);
-        tbl.rows[0].cells[0].innerText=scheduleTable.sunTime0;
-       /* tbl.rows[0].cells[1].innerHTML=scheduleTable.sunSubj0+"<br>"+scheduleTable.sunTeacher0+"<br>"+scheduleTable.sunClassRoom0;
-        tbl.rows[1].cells[0].innerText=scheduleTable.sunTime1;
-        tbl.rows[1].cells[1].innerHTML=scheduleTable.sunSubj1+"<br>"+scheduleTable.sunTeacher1+"<br>"+scheduleTable.sunClassRoom1;
-        tbl.rows[0].cells[2].innerText=scheduleTable.monTime0;
+        tbl.rows[0].cells[0].innerHTML=scheduleTable.sunDate0+"<br>"+scheduleTable.sunTime0;
+        tbl.rows[0].cells[1].innerHTML=scheduleTable.sunCourse0+"<br>"+scheduleTable.sunTeacherName0+"<br>"+scheduleTable.sunTeacherLName0+"<br>"+"auditory: "+scheduleTable.sunAuditory0;
+        tbl.rows[1].cells[0].innerHTML=scheduleTable.sunDate1+"<br>"+scheduleTable.sunTime1;
+        tbl.rows[1].cells[1].innerHTML=scheduleTable.sunCourse1+"<br>"+scheduleTable.sunTeacherName1+"<br>"+scheduleTable.sunTeacherLName1+"<br>"+"auditory: "+scheduleTable.sunAuditory1;
+     /*   tbl.rows[0].cells[2].innerText=scheduleTable.monTime0;
         tbl.rows[0].cells[3].innerHTML=scheduleTable.monSubj0+"<br>"+scheduleTable.monTeacher0+"<br>"+scheduleTable.monClassRoom0;
         tbl.rows[1].cells[2].innerText=scheduleTable.monTime1;
         tbl.rows[1].cells[3].innerHTML=scheduleTable.monSubj1+"<br>"+scheduleTable.monTeacher1+"<br>"+scheduleTable.monClassRoom1;*/
