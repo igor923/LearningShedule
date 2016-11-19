@@ -10,6 +10,12 @@ var dataBaseName = 'learningscheduler';
 var randtoken = require('rand-token');
 var uid = require('rand-token').uid;
 
+// var sqlCreators = require('./sqlCreators');
+
+/*console.log(sqlCreators.sqlCreators());*/
+
+
+
 
 var connection = mysql.createConnection({
     host: 'localhost',
