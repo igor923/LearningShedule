@@ -153,9 +153,16 @@ app.post('/*', function (postReq, postRes) {
                             result.reason = 'sql reqest failed';
                             result.fullErrorText = sqlErr;
                         }
+                        else if (sqlRes.length==0){
+                            result.status = 'error';
+                            result.reason = 'token not found';
+                        }
                         else if (sqlRes[0].currentToken.valueOf() == token.valueOf()) {
                             result.status = 'ok';
                             result.reason = 'token passed';
+                            result.accessLevel =sqlRes[0].accessLevel;
+                            result.login = sqlRes[0].login;
+
                         }
                         console.log(token);
                         console.log(login);
