@@ -1,34 +1,18 @@
 var express = require("express");
-var bodyParser = require("body-parser");
+// var bodyParser = require("body-parser");
 var http = require("http");
 var url = require('url');
 var mysql = require('mysql');
 var app = express();
 var port = 3000;
 var headers = require('./headers');
-var dataBaseName = 'events';
+var dataBaseName = 'learningscheduler';
 var randtoken = require('rand-token');
 var uid = require('rand-token').uid;
 var sqlCreators = require('./sqlCreators');
 
 console.log(sqlCreators.sqlCreators());
 
-app.use("/*", function (req, res, next) {
-
-    var bodyStringData = '';
-    req.on("data", function (chunk) {
-        bodyStringData = bodyStringData + chunk;
-    });
-    req.on("end", function () {
-        console.log(bodyStringData);
-        res.bodyStringData = bodyStringData;
-        if (res.bodyStringData) {
-            res.bodyData = JSON.parse(res.bodyStringData);
-        }
-    });
-    headers.setHeaders(res);
-    next();
-});
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -39,29 +23,55 @@ var connection = mysql.createConnection({
 
 // connection.query(tableAuthScript, function (err, res, fields) {console.log(err);});
 // connection.query(tableStudentScript, function (err, res, fields) {console.log(err);});
+/*
+ *
 
+ SELECT l.timeLesson, cl.numerClassRoom, cr.descriptionCourse, u.name FROM lessons l INNER JOIN classrooms cl on l.idClassRoom = cl.idClassRoom INNER JOIN courses cr on l.idCourse = cr.idCourse INNER JOIN users u on u.idUser = (SELECT idUserTeacher from courses where idCourse = l.idCourse) and l.idCourse in (SELECT idCourse from courses WHERE idGroup in (SELECT idGroup from studentsingroups WHERE idUserStudent = (SELECT idUser from users WHERE currentToken = 'q100500q')))
+
+
+
+
+
+
+
+ *
+ * */
 
 app.listen(port, function () {
     console.log("Started on PORT " + port);
 });
 app.get('/*', function (getReq, getRes) {
     headers.setHeaders(getRes);
-    getReq.on('data', function (chunk) {console.log(chunk)});
+    getReq.on('data', function (chunk) {
+        console.log(chunk)
+    });
     getReq.on('end', function (getData) {
         switch (getReq.path) {
             // default page
-            case '/': {getRes.sendfile("index.html");break;}
+            case '/': {
+                getRes.sendfile("index.html");
+                break;
+            }
             // all other files needed
-            default: {getRes.sendfile(getReq.path.replace('/', ''));}
+            default: {
+                getRes.sendfile(getReq.path.replace('/', ''));
+            }
         }
     });
 });
 
 
 app.post('/*', function (postReq, postRes) {
+    var bodyStringData = '';
+    var bodyData = {};
+    postReq.on("data", function (chunk) {
+        bodyStringData = bodyStringData + chunk;
+    });
+
     postReq.on("end", function () {
-        console.log(postReq.path);
-        console.log(postRes.bodyData);
+        bodyData = JSON.parse(bodyStringData);
+        console.log("bodyStringData ", bodyStringData);
+        console.log("bodyData ", bodyData);
         var result = {};
         switch (postReq.path) {
             case '/auth/user': {
@@ -131,7 +141,101 @@ app.post('/*', function (postReq, postRes) {
 
                 break;
             }
-            case '/check/'
+            case '/check/token': {
+                result = {};
+                sqlScript = 'select * from users where ?';
+                login = bodyData.login;
+                token = bodyData.token;
+                connection.query(sqlScript, {currentToken: token}, function (sqlErr, sqlRes, sqlFields) {
+                        // console.log('error: ', sqlErr);
+                        if (sqlErr) {
+                            result.status = 'error';
+                            result.reason = 'sql reqest failed';
+                            result.fullErrorText = sqlErr;
+                        }
+                        else if (sqlRes[0].currentToken.valueOf() == token.valueOf()) {
+                            result.status = 'ok';
+                            result.reason = 'token passed';
+                        }
+                        console.log(token);
+                        console.log(login);
+                        console.log(sqlRes);
+                        postRes.end(JSON.stringify(result));
+                    }
+                )
+                break;
+            }
+            case '/create/user': {
+                result = {};
+                sqlScript = 'insert into users set ?';
+                connection.query(sqlScript, bodyData, function (sqlErr, sqlRes, sqlFields) {
+                    console.log(sqlErr);
+                    console.log(sqlRes);
+                    result = sqlRes;
+                    postRes.end(JSON.stringify(result));
+                });
+
+                break;
+            }
+            case '/get/scheduler': {
+                console.log(bodyData);
+                sqlScript = "" +
+                    "SELECT " +
+                    "l.timeLesson as time," +
+                    "l.dateLesson as date, " +
+                    "cl.numerClassRoom as auditory, " +
+                    "cl.cityClassRoom as city, " +
+                    "cr.descriptionCourse as course,  " +
+                    "u.name as teacherName, " +
+                    "u.lastName as teacherLastName " +
+                    "FROM lessons l INNER JOIN classrooms cl on l.idClassRoom = cl.idClassRoom INNER JOIN courses cr on l.idCourse = cr.idCourse INNER JOIN users u on u.idUser = (SELECT idUserTeacher from courses where idCourse = l.idCourse) and l.idCourse in (SELECT idCourse from courses WHERE idGroup in (SELECT idGroup from studentsingroups WHERE idUserStudent = (SELECT idUser from users WHERE ?)))";
+                connection.query(sqlScript, {currentToken: bodyData.currentToken}, function (sqlErr, sqlRes, sqlFields) {
+                    console.log(sqlErr);
+                    console.log(sqlRes);
+                    result = sqlRes;
+                    postRes.end(JSON.stringify(result));
+                });
+                break;
+            }
+            case '/set/token': {
+                // console.log(bodyData);
+                //check login - password
+                sqlScript = "select login,pass, from users where ?"
+                sqlBody = {login: bodyData.login}
+                connection.query(sqlScript, sqlBody, function (sqlErr, sqlRes, sqlFields) {
+                     console.log('sqlRes length:',sqlRes.length,"");
+                    if (sqlErr) {
+                        result.status = 'error';
+                        result.reason = 'sql error';
+                        result.fullErrorText = sqlErr;
+                        postRes.end(JSON.stringify(result));
+                    }
+                    else if (sqlRes.length == 0) {
+                        result.status = 'error';
+                        result.reason = 'login not found';
+                        postRes.end(JSON.stringify(result));
+                    }
+                    else if (bodyData.pass.valueOf() == sqlRes[0].pass.valueOf()) {
+                        result.status = 'ok';
+                        result.newToken = uid(32);
+                        console.log('newToken: ',result.newToken," ");
+                        sqlScriptToken = "UPDATE `users` SET `currentToken` = '" + result.newToken + "' WHERE ?"
+                        connection.query(sqlScriptToken, {login: bodyData.login}, function (sqlErr, sqlRes, sqlFields) {
+                            //TODO: WORK WITH ERRORS
+                            postRes.end(JSON.stringify(result));
+                        });
+                    }
+
+
+                });
+
+
+                // TODO: return status:ok / error
+                // TODO: return new token
+                // TODO: insert new token into db
+
+                break;
+            }
             default: {
                 console.log("default");
             }
