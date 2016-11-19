@@ -9,9 +9,9 @@ var headers = require('./headers');
 var dataBaseName = 'learningscheduler';
 var randtoken = require('rand-token');
 var uid = require('rand-token').uid;
-var sqlCreators = require('./sqlCreators');
+// var sqlCreators = require('./sqlCreators');
 
-console.log(sqlCreators.sqlCreators());
+// console.log(sqlCreators.sqlCreators());
 
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -245,6 +245,10 @@ app.post('/*', function (postReq, postRes) {
                 // TODO: return new token
                 // TODO: insert new token into db
 
+                break;
+            }
+            case '/get/students':{
+                console.log(bodyData);
                 break;
             }
             default: {
